@@ -102,7 +102,7 @@ Registar ações observadas e respostas do jogador, não só “gostei/não gost
 - **RECOMENDAÇÃO:** BFS + memória de última posição + linha de visão bloqueada por paredes é o experimento menor que ataca a falha medida e testa agência/recuperação/ambiente.
 - **NÃO É DECISÃO FINAL:** estes três estados não definem o jogo completo nem garantem que furtividade seja o núcleo final. O teste pode levar a simplificar, alterar ou remover a mecânica.
 - **UNKNOWN:** diversão, suspense, legibilidade visual do perseguidor e duração ideal da procura; precisam de playtest humano. A validação headless não confirma estética.
-- **LIMITAÇÃO ATUAL:** Godot não está no `PATH`; foi reconstruído temporariamente em `/tmp` para executar a validação headless. O smoke não produziu captura visual e este binário não inclui display/GUI. O artefacto de Release/Actions continua sem download/restauração confirmados; a revisão visual exige um ambiente com display.
+- **LIMITAÇÃO ATUAL:** Godot não está no `PATH`; foi reconstruído temporariamente em `/tmp` para executar a validação headless. O smoke não produziu captura visual e este binário não inclui display/GUI. O CI do checkpoint (run `36274222692`) compilou, passou os testes e publicou um artefacto Linux headless; download/restauração nesse ambiente e revisão visual continuam por confirmar. É o binário de ferramenta Godot, não uma build executável do jogo.
 
 ## Referências
 

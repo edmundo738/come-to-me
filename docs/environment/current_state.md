@@ -25,6 +25,7 @@ OBSERVED:
 - A GitHub draft Release exists. Direct `gh release upload` from the sandbox failed with TLS/EOF even for a 653-byte manifest.
 - Actions run `36269841970` (`f235f7f`) completed successfully: pinned source build, headless project smoke test, packaging, draft Release upload, and 90-day Actions artifact upload all passed. GitHub Release metadata reports the 92,904,612-byte archive with digest `sha256:cd9b82cc0a6836b71d2f0a18e24ceb986c7a40cd1a57769b0235b6cac4c1aef4`, plus its 114-byte checksum file; the Actions artifact is 91,802,930 bytes.
 - A `gh release download` attempt for the small checksum sidecar ended in TLS/EOF. Asset availability is confirmed by GitHub metadata, but actual download and bootstrap restore remain unverified. GitHub API/read access works.
+- The latest Actions run `36274222692` for the evasion checkpoint completed successfully: pinned engine build, project headless smoke (including the new evasion tests), packaging, Release upload, and Actions artifact upload all succeeded. The uploaded binary targets Linux x86_64 and is headless; it is neither a Windows Godot editor nor an exported game. Asset download on the user's machine has not been confirmed.
 - An explicit `gh workflow run` earlier returned HTTP 403 `Resource not accessible by integration`.
 
 INFERRED:
