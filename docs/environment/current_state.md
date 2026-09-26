@@ -21,7 +21,8 @@ OBSERVED:
 - Godot generated 153 `.import` sidecars and 8 `.uid` files. `.godot/` is ignored cache and not committed.
 - A prior `/usr/local/bin/godot` installation vanished after workspace reset, confirming an out-of-repository binary is not durable by itself.
 - A GitHub draft Release exists. Direct `gh release upload` from the sandbox failed with TLS/EOF even for a 653-byte manifest.
-- At the latest GitHub poll, Actions run `36269841970` (`f235f7f`) was `in_progress` at “Run the project headless smoke test”; the pinned source build step had completed successfully. GitHub still reported zero run artifacts and the draft Release had zero assets at that instant. `gh auth status`, branch listing, and fetch succeed; the prior HTTP 401 is no longer blocking access.
+- Actions run `36269841970` (`f235f7f`) completed successfully: pinned source build, headless project smoke test, packaging, draft Release upload, and 90-day Actions artifact upload all passed. GitHub Release metadata reports the 92,904,612-byte archive with digest `sha256:cd9b82cc0a6836b71d2f0a18e24ceb986c7a40cd1a57769b0235b6cac4c1aef4`, plus its 114-byte checksum file; the Actions artifact is 91,802,930 bytes.
+- A `gh release download` attempt for the small checksum sidecar ended in TLS/EOF. Asset availability is confirmed by GitHub metadata, but actual download and bootstrap restore remain unverified. GitHub API/read access works.
 - An explicit `gh workflow run` earlier returned HTTP 403 `Resource not accessible by integration`.
 
 INFERRED:
@@ -34,8 +35,7 @@ HYPOTHESIS:
 - No remaining hypothesis is being used to explain the parser error. Animation visual quality remains unassessed in this environment.
 
 UNKNOWN:
-- Whether Actions run `36269841970` will complete successfully and upload its Release/90-day artifact; at the latest check it was still building and both stores were empty.
-- Whether a future artifact can be downloaded and restored by bootstrap; the restore path has not yet been exercised.
+- Whether the published Release asset or Actions artifact can be downloaded and restored by bootstrap; the checksum-sidecar transfer returned TLS/EOF, and the full restore path has not been exercised.
 - Whether a human-visible editor session can open in a separate desktop-enabled environment; this binary cannot provide that here.
 - Whether visual capture works with another rendering/display backend; no such backend is installed or compiled here.
 - Whether a standalone exported game package works; export templates and a graphical/runtime review were not tested.
@@ -43,13 +43,14 @@ UNKNOWN:
 CURRENT STATE:
 - Reconciliation started with workspace `HEAD` at `a1ee6c2` and GitHub branch at `f235f7f` (10 commits ahead). Exact-content comparison found all 400 remote paths in the workspace, no workspace-only files, and exactly three differing files: this state record, `docs/environment/godot_environment.md`, and `tools/godot/bootstrap.sh`.
 - The local branch was fast-forwarded to the fetched remote tip without replacing worktree files; the three preserved changes were then synchronized as a narrow checkpoint. The fixed branch tip is the source of truth for the resulting checkpoint.
-- In the latest pre-sync poll, Actions run `36269841970` had completed source compilation and was smoke-testing; the current workspace has no Godot executable in `PATH`, and remote artifact restoration remains unconfirmed.
+- Workspace and GitHub are synchronized on the fixed branch; the practical experience hierarchy is recorded in `docs/game_direction.md`.
+- The current workspace still has no Godot executable in `PATH`. The pinned CI build and headless smoke suite succeeded remotely; Release/Actions assets are published, but downloading/restoring them has not been confirmed.
 
 NEXT ACTION:
-- With workspace and GitHub synchronized, move to practical game planning from the existing prototype. Do not start additional environment work unless the already-running Actions result reveals a concrete blocker or recovery need.
+- Continue practical game planning and production from the existing prototype. Do not rebuild Godot or expand recovery infrastructure unless the project needs the tool or the unresolved asset download becomes a real blocker.
 
 LAST VERIFIED:
-- 2026-09-26 (workspace local time); eight Python unit tests and shell syntax checks pass in this workspace. The Godot headless smoke suite passed in the prior validated environment; it cannot be rerun here because `godot` is absent. Actions run `36269841970` was still in progress at its latest poll.
+- 2026-09-26 (workspace local time); eight Python unit tests and shell syntax checks pass in this workspace. Actions run `36269841970` completed all steps successfully. The Godot smoke suite passed on GitHub's runner; it has not been rerun in this workspace because `godot` is absent.
 
 CHECKPOINT POLICY:
 - The fixed branch `arena/01a0dda9-come-to-me` is the canonical checkpoint. Confirm its tip and worktree status from Git instead of duplicating a self-referential commit ID in this document.
