@@ -261,7 +261,7 @@ func draw_portal(center: Vector2) -> void:
 func draw_player(center: Vector2) -> void:
 	# The gameplay actor is still sorted with the world cell, while the hidden
 	# AnimatedSprite2D node supplies the real SpriteFrames clock and current cel.
-	draw_ellipse(center + Vector2(0, 2), Vector2(15, 7), Color(0.02, 0.04, 0.06, 0.45))
+	draw_shadow_ellipse(center + Vector2(0, 2), Vector2(15, 7), Color(0.02, 0.04, 0.06, 0.45))
 	if player_animation == null or player_animation.sprite_frames == null:
 		return
 	var texture := player_animation.sprite_frames.get_frame_texture(player_animation.animation, player_animation.frame)
@@ -275,7 +275,7 @@ func draw_player(center: Vector2) -> void:
 	draw_texture_rect(texture, destination, false, Color.WHITE)
 
 func draw_enemy(center: Vector2) -> void:
-	draw_ellipse(center + Vector2(0, 2), Vector2(18, 8), Color(0.02, 0.03, 0.05, 0.58))
+	draw_shadow_ellipse(center + Vector2(0, 2), Vector2(18, 8), Color(0.02, 0.03, 0.05, 0.58))
 	# A hunched, hooded silhouette with two readable eyes; kept distinct from
 	# the player's warm face and teal coat.
 	draw_line(center + Vector2(-5, 6), center + Vector2(-9, 16), Color("382b35"), 5.0, true)
@@ -318,7 +318,7 @@ func draw_end_overlay() -> void:
 	draw_string(font, Vector2(0, size.y * 0.47 + 34), status_message, HORIZONTAL_ALIGNMENT_CENTER, size.x, 14, Color("d3dbd6"))
 	draw_string(font, Vector2(0, size.y * 0.47 + 70), "PRESS R TO BEGIN AGAIN", HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("9eadae"))
 
-func draw_ellipse(center: Vector2, radius: Vector2, color: Color) -> void:
+func draw_shadow_ellipse(center: Vector2, radius: Vector2, color: Color) -> void:
 	var points := PackedVector2Array()
 	for index in range(16):
 		var angle := TAU * float(index) / 16.0
