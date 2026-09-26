@@ -1,0 +1,83 @@
+name: Build and cache Godot headless environment
+
+on:
+  push:
+    branches:
+      - arena/01a0dda9-come-to-me
+    paths:
+      - '.github/workflows/godot-headless-artifact.yml'
+      - 'tools/godot/**'
+      - 'tests/godot_headless_smoke.*'
+      - 'project.godot'
+      - 'scenes/**'
+      - 'scripts/**'
+      - 'characters/**'
+      - 'art/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+timeout-minutes: 360
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out the pinned project state
+        uses: actions/checkout@v4
+
+      - name: Install the pinned compiler and build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential g++-12 python3-venv python3-pip ca-certificates tar gzip coreutils
+          g++-12 --version | head -n 1
+
+      - name: Build Godot from the pinned source
+        env:
+          GODOT_INSTALL_DIR: ${{ runner.temp }}/godot-install
+          GODOT_ARTIFACT_DIR: ${{ runner.temp }}/godot-artifacts
+          GODOT_BUILD_JOBS: '4'
+          GODOT_CC: gcc-12
+          GODOT_CXX: g++-12
+        run: tools/godot/build_headless.sh
+
+      - name: Run the project headless smoke test
+        env:
+          GODOT_BIN: ${{ runner.temp }}/godot-install/godot
+        run: tests/godot_headless_smoke.sh
+
+      - name: Package the checked executable and checksums
+        run: |
+          set -euo pipefail
+          artifact_dir="${{ runner.temp }}/godot-artifacts"
+          asset="godot-headless-4.7.2-custom-linux-x86_64.tar.gz"
+          (cd "$artifact_dir" && sha256sum godot > SHA256SUMS)
+          tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner \
+            --pax-option=delete=atime,delete=ctime -cf - \
+            -C "$artifact_dir" godot manifest.txt SHA256SUMS | gzip -n -1 > "$RUNNER_TEMP/$asset"
+          (cd "$RUNNER_TEMP" && sha256sum "$asset" > "$asset.sha256")
+          stat -c '%n %s bytes' "$RUNNER_TEMP/$asset"
+          cat "$RUNNER_TEMP/$asset.sha256"
+
+      - name: Upload durable draft Release asset
+        id: release_upload
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release upload godot-headless-4.7.2-custom-linux-x86_64 \
+            "$RUNNER_TEMP/godot-headless-4.7.2-custom-linux-x86_64.tar.gz" \
+            "$RUNNER_TEMP/godot-headless-4.7.2-custom-linux-x86_64.tar.gz.sha256" \
+            --repo edmundo738/come-to-me --clobber
+
+      - name: Upload a 90-day Actions artifact fallback
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-headless-4.7.2-linux-x86_64
+          path: |
+            ${{ runner.temp }}/godot-headless-4.7.2-custom-linux-x86_64.tar.gz
+            ${{ runner.temp }}/godot-headless-4.7.2-custom-linux-x86_64.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 90

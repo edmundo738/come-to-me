@@ -27,6 +27,12 @@ readonly SCONS_FLAGS=(
   sdl=no
   accesskit=no
 )
+COMPILER_FLAGS=()
+if [[ -n "${GODOT_CC:-}" && -n "${GODOT_CXX:-}" ]]; then
+  COMPILER_FLAGS=("CC=$GODOT_CC" "CXX=$GODOT_CXX")
+fi
+BUILD_CC="${GODOT_CC:-gcc}"
+BUILD_CXX="${GODOT_CXX:-g++}"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 INSTALL_DIR="${GODOT_INSTALL_DIR:-/usr/local/bin}"
@@ -36,7 +42,7 @@ START_SECONDS=$SECONDS
 cleanup() { rm -rf "$BUILD_ROOT"; }
 trap cleanup EXIT
 
-for command_name in python3 g++ tar sha256sum; do
+for command_name in python3 "$BUILD_CC" "$BUILD_CXX" tar sha256sum; do
   command -v "$command_name" >/dev/null || { echo "Missing build dependency: $command_name" >&2; exit 1; }
 done
 [[ "$(uname -m)" == "x86_64" ]] || { echo "This pinned build is for x86_64 only." >&2; exit 1; }
@@ -91,7 +97,7 @@ PKGCONFIG
 chmod +x "$BUILD_ROOT/build-tools/pkg-config"
 
 PATH="$BUILD_ROOT/build-tools:$PATH" "$BUILD_ROOT/venv/bin/scons" \
-  -C "$BUILD_ROOT/source" -j"$BUILD_JOBS" "${SCONS_FLAGS[@]}"
+  -C "$BUILD_ROOT/source" -j"$BUILD_JOBS" "${SCONS_FLAGS[@]}" "${COMPILER_FLAGS[@]}"
 
 BUILT_BINARY="$BUILD_ROOT/source/bin/godot.linuxbsd.editor.x86_64"
 [[ -x "$BUILT_BINARY" ]] || { echo "SCons completed without the expected executable." >&2; exit 1; }
@@ -130,7 +136,8 @@ Source archive SHA-256: $SOURCE_SHA256
 Architecture: x86_64
 Platform: linuxbsd
 Build target: editor; headless-capable, no X11/Wayland GUI backends
-SCons flags: ${SCONS_FLAGS[*]}
+Compiler: $("$BUILD_CXX" --version | head -n 1)
+SCons flags: ${SCONS_FLAGS[*]} ${COMPILER_FLAGS[*]}
 Build jobs: -j$BUILD_JOBS
 Source archive bytes: $source_archive_size
 Observed build + install elapsed seconds: $BUILD_ELAPSED
