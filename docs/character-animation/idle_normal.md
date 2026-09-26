@@ -2,7 +2,7 @@
 
 **Emotional read:** composed, alert, alive; normal breathing under restrained tension.
 **Estado atual:** `IDLE_N_FRENTE` e `IDLE_N_TRAS` aprovados provisoriamente; `IDLE_N_ESQUERDA` e `IDLE_N_DIREITA` têm ciclos candidatos em revisão. O foco agora é testar no Godot o seletor das quatro direções.
-**Não iniciar agora:** caminhada, medo, piscada como ação separada ou gestos até concluir a revisão dos idles.
+**Escopo:** o utilizador autorizou um estudo experimental `WALK_N_FRENTE` em pasta isolada de review antes de concluir os idles laterais. Isso não libera a promoção do walk à produção nem autoriza iniciar outras direções; medo, piscada como ação separada e gestos continuam fora de escopo.
 
 ## What the player should perceive
 
