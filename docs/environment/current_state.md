@@ -13,7 +13,7 @@ MEASURED:
 - `tests/godot_headless_smoke.sh` passes: editor/import scan, PNG checks, runtime SpriteFrames, timed AnimatedSprite2D, TRES save/reload, main-scene integration, default-scene bounded startup, and animation-review scene startup.
 - All four 12-frame sequences are RGBA `384×544`; their individual durations match the configured values and each cycle totals 3.19 seconds.
 - Front source frames 001/002 differ in 2,449 of 208,896 pixels. This is file-level evidence only, not an art-quality judgment.
-- Prepared cache archive: 89 MiB compressed; SHA-256 `60f5d7032e98ec9b87aa3e3debf4da78eaa879c6c0fd6b43755673f649edfb65`. It is outside Git; no final remote asset status is confirmed.
+- Locally prepared archive: 93,208,968 bytes; SHA-256 `60f5d7032e98ec9b87aa3e3debf4da78eaa879c6c0fd6b43755673f649edfb65`, outside Git. Separately, GitHub Release metadata confirms CI archive digest `sha256:cd9b82cc0a6836b71d2f0a18e24ceb986c7a40cd1a57769b0235b6cac4c1aef4`; do not conflate the two builds.
 
 OBSERVED:
 - Runtime ClassDB reports `CanvasItem.draw_ellipse(position, major, minor, color, filled, width, antialiased)`; the pre-fix Godot log said the local method signature did not match the parent. After the rename, the editor scan and both scenes run without script/resource errors.
@@ -28,7 +28,7 @@ OBSERVED:
 INFERRED:
 - The function-name collision was the reported parser failure's cause; the exact incompatible signature plus the post-rename passing parser/scene tests confirm the diagnosis.
 - A cached artifact is needed for rapid recovery; the source rebuild path is reproducible but costs about 34 minutes in this workspace.
-- GitHub Releases/Actions storage is appropriate for the binary, but artifact availability and download have not been proven with the current GitHub connection.
+- Release and Actions artifact publication is confirmed. GitHub metadata can be read; actual asset download and bootstrap restoration have not been proven because the sidecar transfer returned TLS/EOF.
 - Headless results A–E do not establish smoothness, jitter, pivot, scale, halo/shadow appearance, visual continuity, or human approval.
 
 HYPOTHESIS:
@@ -36,18 +36,18 @@ HYPOTHESIS:
 
 UNKNOWN:
 - Whether the published Release asset or Actions artifact can be downloaded and restored by bootstrap; the checksum-sidecar transfer returned TLS/EOF, and the full restore path has not been exercised.
+- Cause of the local Git ref resetting to the initial commit at the start of a later workspace turn; the exact source tree was present, but the repository metadata needed re-alignment.
 - Whether a human-visible editor session can open in a separate desktop-enabled environment; this binary cannot provide that here.
 - Whether visual capture works with another rendering/display backend; no such backend is installed or compiled here.
 - Whether a standalone exported game package works; export templates and a graphical/runtime review were not tested.
 
 CURRENT STATE:
-- Reconciliation started with workspace `HEAD` at `a1ee6c2` and GitHub branch at `f235f7f` (10 commits ahead). Exact-content comparison found all 400 remote paths in the workspace, no workspace-only files, and exactly three differing files: this state record, `docs/environment/godot_environment.md`, and `tools/godot/bootstrap.sh`.
-- The local branch was fast-forwarded to the fetched remote tip without replacing worktree files; the three preserved changes were then synchronized as a narrow checkpoint. The fixed branch tip is the source of truth for the resulting checkpoint.
-- Workspace and GitHub are synchronized on the fixed branch; the practical experience hierarchy is recorded in `docs/game_direction.md`.
-- The current workspace still has no Godot executable in `PATH`. The pinned CI build and headless smoke suite succeeded remotely; Release/Actions assets are published, but downloading/restoring them has not been confirmed.
+- At the start of this turn, local Git refs again showed `HEAD=a1ee6c2` while GitHub was at `5b20cbf`. Exact-content comparison found all 401 remote files present locally, with no missing, extra, or differing source files. The local ref was re-aligned by a mixed reset without replacing files. The reason this metadata reset recurs across turns is UNKNOWN.
+- The approved experience hierarchy is in `docs/game_direction.md`; focused research, code evidence and the proposed first experiment are in `docs/gameplay_core_research.md`.
+- The current workspace still has no Godot executable in `PATH`. CI build and headless smoke passed remotely and Release/Actions assets are published; download/restore remains unverified.
 
 NEXT ACTION:
-- Continue practical game planning and production from the existing prototype. Do not rebuild Godot or expand recovery infrastructure unless the project needs the tool or the unresolved asset download becomes a real blocker.
+- With the research checkpoint synchronized, implement the isolated first evasion experiment: correct grid pathfinding and test a visible-pursuit / last-seen-search loop. Use a working Godot binary only because it enables concrete game implementation and tests; do not expand recovery infrastructure beyond that need. Human visual playtest remains required.
 
 LAST VERIFIED:
 - 2026-09-26 (workspace local time); eight Python unit tests and shell syntax checks pass in this workspace. Actions run `36269841970` completed all steps successfully. The Godot smoke suite passed on GitHub's runner; it has not been rerun in this workspace because `godot` is absent.

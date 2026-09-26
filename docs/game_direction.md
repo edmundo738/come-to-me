@@ -14,27 +14,18 @@ Essa ordem é uma prioridade relativa, não uma percentagem nem três modos sepa
 
 - Projeto Godot com grelha screen-aligned de `11 × 9`; a sala atual é fixa e desenhada em código.
 - O jogador pode mover-se uma célula, saltar duas células na última direção escolhida, ou esperar. Um movimento bloqueado não consome turno.
-- O perseguidor usa uma perseguição determinística por distância Manhattan, evita paredes e desempata na ordem direita, baixo, esquerda, cima. A intenção seguinte não é mostrada como marcador; o jogador deve aprender observando os movimentos.
+- O perseguidor tenta reduzir a distância Manhattan e desempata na ordem direita, baixo, esquerda, cima; isto não é pathfinding e, no mapa atual, a simulação confirma que ele pode parar numa parede apesar de existir rota. A intenção seguinte não é mostrada como marcador. A investigação e o próximo experimento estão em `docs/gameplay_core_research.md`.
 - Mover-se pode atrair o perseguidor para a célula que o jogador acabou de deixar; isso já oferece uma forma básica de despiste, não um sistema geral de distração.
 - Há dois escudos fixos, colisões têm consequências, existem fragmentos opcionais e uma saída/portal.
 - As paredes bloqueiam movimento. Não há ainda mecânica implementada de esconder-se/cobertura, distração por objetos/ruído, inventário de sobrevivência, níveis ou narrativa ambiental interativa.
 
 Estes pontos descrevem o código do protótipo; não provam que o loop seja divertido, suficientemente tenso ou legível para novos jogadores.
 
-## Próximo passo recomendado — testar o loop antes de ampliar sistemas
+## Próximo passo recomendado — experiência isolada, não fórmula do jogo inteiro
 
-Refinar **uma única sala curta** para testar se a evasão já oferece escolhas legíveis usando os verbos atuais: observar, escolher rota, mover, esperar, saltar e atrair o perseguidor. Manter os fragmentos como possível desvio de risco/recompensa e a saída como objetivo claro. Usar o ambiente para sugerir contexto sem interromper o encontro.
+A pesquisa em `docs/gameplay_core_research.md` encontrou um bloqueador antes de avaliar diversão: a perseguição atual para numa parede na sala inicial. Primeiro corrigir o passo guloso com BFS determinístico; depois testar numa sala curta a hipótese **linha de visão → perseguição → perda de visão → procura da última posição → alívio**.
 
-Na revisão dessa sala, observar com o proprietário/jogadores:
-
-- se fica claro quando a ameaça avança e como aprender o padrão sem revelar uma seta de intenção;
-- se há decisões significativas além de simplesmente afastar-se;
-- se o espaço dá oportunidade de planejar, baitar e recuperar-se de um erro;
-- se os escudos tornam o risco compreensível, sem trivializar ou punir injustamente;
-- se procurar um fragmento cria uma escolha real entre recompensa e segurança;
-- se atmosfera e descoberta reforçam a tensão sem atrasar o loop.
-
-**Recomendação:** não implementar simultaneamente esconderijo, ruído, inventário e outros sistemas. Primeiro observar o que a sala e as ações existentes já conseguem produzir; depois escolher uma única capacidade ausente, caso a evidência mostre que ela acrescenta uma decisão necessária.
+Usar paredes como oclusão e ações já existentes (mover, esperar, saltar); manter dois escudos e o fragmento opcional só como parâmetros do primeiro teste. Não adicionar botão de esconderijo, distrações, inventário ou Diretor dinâmico. Os parâmetros de alcance e duração da procura continuam experimentais. Critérios e observações estão no documento da pesquisa.
 
 ## UNKNOWN / ainda não decidido
 

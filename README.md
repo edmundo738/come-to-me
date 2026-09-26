@@ -45,7 +45,7 @@ The map and game rules use integer grid coordinates; projection and rendering ar
 
 ## Project status
 
-- **Game direction:** tactical evasion/horror is the primary experience, supported by survival-horror stakes and atmospheric/narrative exploration; see `docs/game_direction.md` for the agreed weighting and the first-slice recommendation.
+- **Game direction:** tactical evasion/horror is the primary experience, supported by survival-horror stakes and atmospheric/narrative exploration; see `docs/game_direction.md` for the agreed weighting and `docs/gameplay_core_research.md` for the evidence-backed first experiment.
 - **Implemented:** Godot project/scene, screen-aligned shallow top-down grid, four-direction movement and direction-matched 12-frame protagonist idle loops, turn-based enemy response with hidden internal planning, collision and limited shields, directional two-cell jump, wait, fragments, exit, win/game-over states, restart, adaptive viewport centering.
 - **Confirmed running by the project owner:** the project opens in Godot and the game is playable. The owner clarified the camera should not be classic diamond isometric and that enemy movement should be learned by observation, without a visible intent marker. The current pass follows those rules; its camera and wall-depth changes still need a fresh in-editor check.
 - **Working by code inspection:** the intended turn order, deterministic pursuit, and map path to the exit.
