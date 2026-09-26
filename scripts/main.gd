@@ -12,6 +12,14 @@ const WALL_RIGHT := Color("637178")
 const TEAL := Color("78d8c4")
 const GOLD := Color("f2c66d")
 const RED := Color("f07178")
+const PLAYER_SPRITE_SCALE := 0.15
+const PLAYER_FRAME_DURATIONS := [0.27, 0.25, 0.25, 0.25, 0.27, 0.30, 0.30, 0.30, 0.25, 0.25, 0.25, 0.25]
+const PLAYER_ANIMATION_PATHS := {
+	"FRONT": "res://characters/protagonist/animations/idle_normal/frente/",
+	"BACK": "res://characters/protagonist/animations/idle_normal/tras/",
+	"LEFT": "res://characters/protagonist/review/idle_n_esquerda_skeleton_05/frames/",
+	"RIGHT": "res://characters/protagonist/review/idle_n_direita_skeleton_02/frames/",
+}
 
 var world: GridWorld
 var player: ActorState
@@ -23,11 +31,55 @@ var last_direction := Vector2i.RIGHT
 var game_state := "playing" # playing, won, game_over
 var status_message := "The signal is faint. Find the way out."
 var font: Font
+var player_animation: AnimatedSprite2D
 
 func _ready() -> void:
 	font = ThemeDB.fallback_font
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	player_animation = AnimatedSprite2D.new()
+	player_animation.name = "PlayerIdleAnimation"
+	player_animation.sprite_frames = build_player_sprite_frames()
+	player_animation.play("RIGHT")
+	player_animation.visible = false # Its current frame is drawn in the world's depth-sorted pass.
+	add_child(player_animation)
+	player_animation.frame_changed.connect(queue_redraw)
 	start_run()
 	get_viewport().size_changed.connect(queue_redraw)
+
+func build_player_sprite_frames() -> SpriteFrames:
+	var sprite_frames := SpriteFrames.new()
+	sprite_frames.clear_all()
+	for animation_name in PLAYER_ANIMATION_PATHS:
+		sprite_frames.add_animation(animation_name)
+		sprite_frames.set_animation_loop(animation_name, true)
+		sprite_frames.set_animation_speed(animation_name, 1.0)
+		var base_path: String = PLAYER_ANIMATION_PATHS[animation_name]
+		for frame_index in range(PLAYER_FRAME_DURATIONS.size()):
+			var filename := "frame_%03d.png" % (frame_index + 1)
+			var texture := load(base_path + filename) as Texture2D
+			if texture == null:
+				push_error("Missing player animation frame: %s%s" % [base_path, filename])
+				continue
+			sprite_frames.add_frame(animation_name, texture, PLAYER_FRAME_DURATIONS[frame_index])
+	return sprite_frames
+
+func animation_for_direction(direction: Vector2i) -> String:
+	if direction == Vector2i.UP:
+		return "BACK"
+	if direction == Vector2i.DOWN:
+		return "FRONT"
+	if direction == Vector2i.LEFT:
+		return "LEFT"
+	return "RIGHT"
+
+func set_player_facing(direction: Vector2i) -> void:
+	if player_animation == null:
+		return
+	var animation_name := animation_for_direction(direction)
+	if player_animation.animation != animation_name:
+		player_animation.play(animation_name)
+		player_animation.speed_scale = 1.0
+	queue_redraw()
 
 func start_run() -> void:
 	world = GridWorld.new()
@@ -40,6 +92,7 @@ func start_run() -> void:
 	game_state = "playing"
 	status_message = "The signal is faint. Find the way out."
 	enemy.plan_step(player.cell, world)
+	set_player_facing(last_direction)
 	queue_redraw()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -56,6 +109,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	match action.type:
 		"move":
 			last_direction = action.direction
+			set_player_facing(last_direction)
 			perform_player_action(action.direction, false)
 		"jump":
 			perform_player_action(last_direction, true)
@@ -205,21 +259,20 @@ func draw_portal(center: Vector2) -> void:
 	draw_string(font, center + Vector2(-13, 14), "EXIT", HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color("b8f1e6"))
 
 func draw_player(center: Vector2) -> void:
-	draw_ellipse(center + Vector2(0, 2), Vector2(17, 8), Color(0.02, 0.04, 0.06, 0.5))
-	# Boots and legs sit below the coat so the character has a clear upright read.
-	draw_line(center + Vector2(-4, 9), center + Vector2(-6, 19), Color("263239"), 5.0, true)
-	draw_line(center + Vector2(4, 9), center + Vector2(6, 19), Color("263239"), 5.0, true)
-	draw_line(center + Vector2(-6, 19), center + Vector2(-2, 20), Color("d0bd9a"), 3.0, true)
-	draw_line(center + Vector2(6, 19), center + Vector2(10, 20), Color("d0bd9a"), 3.0, true)
-	# Backpack, coat and arms give the player a recognizable explorer silhouette.
-	draw_colored_polygon(PackedVector2Array([center + Vector2(-11, -12), center + Vector2(-5, -16), center + Vector2(-4, 4), center + Vector2(-11, 2)]), Color("bd985b"))
-	draw_colored_polygon(PackedVector2Array([center + Vector2(-7, -14), center + Vector2(0, -18), center + Vector2(8, -13), center + Vector2(7, 7), center + Vector2(0, 13), center + Vector2(-7, 7)]), Color("428e88"))
-	draw_line(center + Vector2(-8, -8), center + Vector2(-13, 3), Color("d4ad79"), 4.0, true)
-	draw_line(center + Vector2(8, -8), center + Vector2(12, 2), Color("d4ad79"), 4.0, true)
-	draw_circle(center + Vector2(0, -22), 7, Color("c69f79"))
-	draw_arc(center + Vector2(0, -22), 7, PI, TAU, 16, Color("263239"), 4.0, true)
-	draw_circle(center + Vector2(2, -22), 1.2, Color("20262a"))
-	draw_circle(center + Vector2(0, -31), 2.5, TEAL)
+	# The gameplay actor is still sorted with the world cell, while the hidden
+	# AnimatedSprite2D node supplies the real SpriteFrames clock and current cel.
+	draw_ellipse(center + Vector2(0, 2), Vector2(15, 7), Color(0.02, 0.04, 0.06, 0.45))
+	if player_animation == null or player_animation.sprite_frames == null:
+		return
+	var texture := player_animation.sprite_frames.get_frame_texture(player_animation.animation, player_animation.frame)
+	if texture == null:
+		return
+	var draw_size := Vector2(texture.get_size()) * PLAYER_SPRITE_SCALE
+	# The PNGs share a canvas with the boot-contact row at y=504. This root
+	# offset places that contact just below the logical tile center.
+	var sprite_center := center + Vector2(0, -15)
+	var destination := Rect2(sprite_center - draw_size * 0.5, draw_size)
+	draw_texture_rect(texture, destination, false, Color.WHITE)
 
 func draw_enemy(center: Vector2) -> void:
 	draw_ellipse(center + Vector2(0, 2), Vector2(18, 8), Color(0.02, 0.03, 0.05, 0.58))
@@ -245,8 +298,8 @@ func draw_interface() -> void:
 	for index in range(MAX_SHIELDS):
 		var pip_color := TEAL if index < shields else Color("42545b")
 		draw_circle(Vector2(552 + index * 22, 33), 6, pip_color)
-	draw_string(font, Vector2(700, 37), "WATCH. LEARN. MOVE.", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, TEAL)
-	draw_string(font, Vector2(700, 62), "Read the pursuer's behavior", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("9eadae"))
+	draw_string(font, Vector2(700, 37), "FACING  %s" % animation_for_direction(last_direction), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, TEAL)
+	draw_string(font, Vector2(700, 62), "IDLE BREATHING  /  12 FRAMES", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("9eadae"))
 	draw_string(font, Vector2(35, 88), status_message, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("bdc9c2"))
 
 func draw_footer() -> void:
