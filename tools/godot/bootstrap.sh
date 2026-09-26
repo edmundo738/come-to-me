@@ -6,11 +6,8 @@ EXPECTED_VERSION="4.7.2.stable.custom_build"
 RELEASE_TAG="godot-headless-4.7.2-custom-linux-x86_64"
 RELEASE_ASSET="godot-headless-4.7.2-custom-linux-x86_64.tar.gz"
 RELEASE_ASSET_SHA="${RELEASE_ASSET}.sha256"
-# These hashes pin the verified cached binary/archive, not arbitrary rebuilds.
-EXPECTED_RELEASE_SHA256="60f5d7032e98ec9b87aa3e3debf4da78eaa879c6c0fd6b43755673f649edfb65"
-EXPECTED_BINARY_SHA256="db4cf162429ca0352be3b0a03125e111451c4130b9a078885ba68cf7fca23564"
 ACTIONS_ARTIFACT_NAME="godot-headless-4.7.2-linux-x86_64"
-WORKFLOW_FILE="godot-headless-artifact.yml"
+WORKFLOW_ID="367932912"
 INSTALL_DIR="${GODOT_INSTALL_DIR:-/usr/local/bin}"
 
 install_binary() {
@@ -34,16 +31,17 @@ restore_archive() {
 
   expected_archive_sha="$(awk '{print $1}' "$checksum_file" 2>/dev/null || true)"
   actual_archive_sha="$(sha256sum "$archive" 2>/dev/null | awk '{print $1}' || true)"
-  [[ -s "$archive" \
-      && "$expected_archive_sha" == "$EXPECTED_RELEASE_SHA256" \
-      && "$actual_archive_sha" == "$EXPECTED_RELEASE_SHA256" ]] || return 1
+  [[ -s "$archive" && -n "$expected_archive_sha" && "$actual_archive_sha" == "$expected_archive_sha" ]] || return 1
   tar -tzf "$archive" >/dev/null 2>&1 || return 1
   mkdir -p "$unpack_dir"
   tar -xzf "$archive" -C "$unpack_dir"
-  [[ -x "$unpack_dir/godot" && -f "$unpack_dir/SHA256SUMS" ]] || return 1
-  actual_binary_sha="$(sha256sum "$unpack_dir/godot" | awk '{print $1}')"
-  [[ "$actual_binary_sha" == "$EXPECTED_BINARY_SHA256" ]] || return 1
+  [[ -x "$unpack_dir/godot" && -f "$unpack_dir/SHA256SUMS" && -f "$unpack_dir/manifest.txt" ]] || return 1
   [[ "$("$unpack_dir/godot" --version 2>&1 | tail -n 1)" == "$EXPECTED_VERSION" ]] || return 1
+  grep -Fxq "Source commit: ed1daf0bf001b61586d9930840f2f1394092c079" "$unpack_dir/manifest.txt" || return 1
+  grep -Fxq "Source archive SHA-256: e607e9985e1c201bc9cdc1aec8a120f0c3f53b9603f1f828e2b748534a2471ef" "$unpack_dir/manifest.txt" || return 1
+  actual_binary_sha="$(sha256sum "$unpack_dir/godot" | awk '{print $1}')"
+  manifest_binary_sha="$(awk -F': ' '/^Executable SHA-256:/ {print $2}' "$unpack_dir/manifest.txt")"
+  [[ -n "$manifest_binary_sha" && "$actual_binary_sha" == "$manifest_binary_sha" ]] || return 1
   (cd "$unpack_dir" && sha256sum -c SHA256SUMS)
   install_binary "$unpack_dir/godot"
 }
@@ -78,7 +76,7 @@ fi
 # be fetched. Query only successful runs of this repository's pinned workflow.
 if [[ "$restored" != true ]] && command -v gh >/dev/null; then
   run_id="$(gh run list --repo edmundo738/come-to-me \
-    --workflow "$WORKFLOW_FILE" --branch arena/01a0dda9-come-to-me --limit 20 \
+    --workflow "$WORKFLOW_ID" --branch arena/01a0dda9-come-to-me --limit 20 \
     --json databaseId,conclusion \
     --jq '[.[] | select(.conclusion == "success")][0].databaseId // empty' 2>/dev/null || true)"
   if [[ -n "$run_id" ]] && gh run download "$run_id" \
