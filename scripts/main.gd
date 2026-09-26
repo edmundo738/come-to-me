@@ -133,51 +133,60 @@ func _draw() -> void:
 		return
 	var origin := world.screen_origin(get_viewport_rect().size)
 	draw_interface()
-	var cells: Array[Vector2i] = []
+	# Back-to-front by screen row. Actors can pass behind foreground objects.
 	for y in range(GridWorld.HEIGHT):
 		for x in range(GridWorld.WIDTH):
-			cells.append(Vector2i(x, y))
-	cells.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
-		return a.x + a.y < b.x + b.y
-	)
-	for cell in cells:
-		draw_floor_tile(origin + world.to_screen(cell), cell)
-		if world.walls.has(cell):
-			draw_wall(origin + world.to_screen(cell))
-		elif world.coins.has(cell):
-			draw_coin(origin + world.to_screen(cell))
-	if player != null and enemy != null:
-		draw_portal(origin + world.to_screen(world.portal))
-		draw_enemy_intent(origin + world.to_screen(enemy.cell), origin + world.to_screen(enemy.intent))
-		draw_enemy(origin + world.to_screen(enemy.cell))
-		draw_player(origin + world.to_screen(player.cell))
+			var cell := Vector2i(x, y)
+			var center := origin + world.to_screen(cell)
+			draw_floor_tile(center, cell)
+			if cell == world.portal:
+				draw_portal(center)
+			if world.walls.has(cell):
+				draw_wall(center)
+			elif world.coins.has(cell):
+				draw_coin(center)
+			if enemy != null and enemy.cell == cell:
+				draw_enemy(center)
+			if player != null and player.cell == cell:
+				draw_player(center)
 	draw_footer()
 	if game_state != "playing":
 		draw_end_overlay()
 
 func draw_floor_tile(center: Vector2, cell: Vector2i) -> void:
-	var points := diamond(center, GridWorld.TILE_WIDTH * 0.5, GridWorld.TILE_HEIGHT * 0.5)
+	var size := Vector2(GridWorld.TILE_WIDTH, GridWorld.TILE_HEIGHT * 0.92)
+	var rect := Rect2(center - size * 0.5, size)
 	var color := TILE_LIGHT if (cell.x + cell.y) % 2 == 0 else TILE_DARK
-	draw_colored_polygon(points, color)
-	# A full, consistent cell outline makes the movement grid easy to read.
-	draw_polyline(PackedVector2Array([points[0], points[1], points[2], points[3], points[0]]), TILE_EDGE, 1.35, true)
+	draw_rect(rect, color)
+	# Straight grid edges preserve immediate screen-direction readability.
+	draw_rect(rect, TILE_EDGE, false, 1.2)
 
 func draw_wall(center: Vector2) -> void:
-	# A single extruded isometric block: two side faces, then one top diamond.
-	# Keeping the base vertices aligned with the floor cell avoids the old
-	# skewed/overlapping wall shape.
-	var base := diamond(center, GridWorld.TILE_WIDTH * 0.5, GridWorld.TILE_HEIGHT * 0.5)
-	var top_center := center + Vector2(0, -38)
-	var top := diamond(top_center, GridWorld.TILE_WIDTH * 0.5, GridWorld.TILE_HEIGHT * 0.5)
-	var left_face := PackedVector2Array([top[3], top[2], base[2], base[3]])
-	var right_face := PackedVector2Array([top[2], top[1], base[1], base[2]])
-	draw_colored_polygon(left_face, WALL_LEFT)
-	draw_colored_polygon(right_face, WALL_RIGHT)
+	# Raised rectangular wall block, seen from a shallow top-down angle.
+	var half_w := GridWorld.TILE_WIDTH * 0.5
+	var half_h := GridWorld.TILE_HEIGHT * 0.92 * 0.5
+	var lift := 28.0
+	var base := PackedVector2Array([
+		center + Vector2(-half_w, -half_h),
+		center + Vector2(half_w, -half_h),
+		center + Vector2(half_w, half_h),
+		center + Vector2(-half_w, half_h)
+	])
+	var top := PackedVector2Array([
+		base[0] + Vector2(0, -lift),
+		base[1] + Vector2(0, -lift),
+		base[2] + Vector2(0, -lift),
+		base[3] + Vector2(0, -lift)
+	])
+	# Only faces on the near/right sides are shaded; the flat top remains clear.
+	draw_colored_polygon(PackedVector2Array([top[3], top[2], base[2], base[3]]), WALL_LEFT)
+	draw_colored_polygon(PackedVector2Array([top[1], top[2], base[2], base[1]]), WALL_RIGHT)
 	draw_colored_polygon(top, WALL_TOP)
-	var outline := Color("c1c7bd")
-	draw_polyline(PackedVector2Array([top[3], top[2], top[1], base[1], base[2], base[3], top[3]]), outline, 1.7, true)
-	# Simple material seam: reads as a solid block, not a strange floor marking.
-	draw_line(top[3] + Vector2(9, 5), top[2] + Vector2(-9, 5), Color("aeb8b0", 0.65), 1.0, true)
+	var outline := Color("d1d3c9")
+	draw_polyline(PackedVector2Array([top[0], top[1], top[2], top[3], top[0]]), outline, 1.5, true)
+	draw_line(top[3], base[3], outline, 1.2, true)
+	draw_line(top[2], base[2], outline, 1.2, true)
+	draw_line(top[1], base[1], Color(outline, 0.65), 1.0, true)
 
 func draw_coin(center: Vector2) -> void:
 	draw_circle(center + Vector2(0, -7), 8, Color(0.10, 0.12, 0.13, 0.5))
@@ -185,24 +194,15 @@ func draw_coin(center: Vector2) -> void:
 	draw_circle(center + Vector2(-1, -14), 2, Color(1.0, 0.91, 0.67))
 
 func draw_portal(center: Vector2) -> void:
-	draw_colored_polygon(diamond(center + Vector2(0, -4), 21, 10), Color(0.25, 0.8, 0.77, 0.18))
-	draw_arc(center + Vector2(0, -8), 13, PI, TAU, 24, TEAL, 3.0, true)
-	draw_line(center + Vector2(-13, -8), center + Vector2(-13, 3), TEAL, 3.0)
-	draw_line(center + Vector2(13, -8), center + Vector2(13, 3), TEAL, 3.0)
-	draw_line(center + Vector2(-13, 3), center + Vector2(13, 3), TEAL, 3.0)
-	draw_string(font, center + Vector2(-18, 26), "EXIT", HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color(0.65, 0.9, 0.86, 0.8))
-
-func draw_enemy_intent(from: Vector2, to: Vector2) -> void:
-	if from.distance_to(to) < 2:
-		return
-	# Mark only the destination cell; a long arrow crossing the board made the
-	# tactical picture noisy and obscured the grid.
-	var marker := to + Vector2(0, -1)
-	var points := diamond(marker, GridWorld.TILE_WIDTH * 0.5 - 5, GridWorld.TILE_HEIGHT * 0.5 - 3)
-	draw_colored_polygon(points, Color(RED, 0.24))
-	draw_polyline(PackedVector2Array([points[0], points[1], points[2], points[3], points[0]]), RED, 2.2, true)
-	draw_circle(to + Vector2(0, -9), 9, Color("311f27"))
-	draw_string(font, to + Vector2(-4, -5), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("ffe4d8"))
+	var footprint := Rect2(center + Vector2(-22, -8), Vector2(44, 16))
+	draw_rect(footprint, Color(TEAL, 0.13))
+	draw_rect(footprint, Color(TEAL, 0.65), false, 1.5)
+	# A simple upright doorway, grounded on the same screen-aligned grid.
+	draw_line(center + Vector2(-15, -3), center + Vector2(-15, -25), TEAL, 3.0, true)
+	draw_line(center + Vector2(15, -3), center + Vector2(15, -25), TEAL, 3.0, true)
+	draw_arc(center + Vector2(0, -25), 15, PI, TAU, 20, TEAL, 3.0, true)
+	draw_line(center + Vector2(-10, -3), center + Vector2(10, -3), Color(TEAL, 0.7), 1.0, true)
+	draw_string(font, center + Vector2(-13, 14), "EXIT", HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color("b8f1e6"))
 
 func draw_player(center: Vector2) -> void:
 	draw_ellipse(center + Vector2(0, 2), Vector2(17, 8), Color(0.02, 0.04, 0.06, 0.5))
@@ -245,8 +245,8 @@ func draw_interface() -> void:
 	for index in range(MAX_SHIELDS):
 		var pip_color := TEAL if index < shields else Color("42545b")
 		draw_circle(Vector2(552 + index * 22, 33), 6, pip_color)
-	draw_string(font, Vector2(700, 37), "PURSUER INTENT", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, RED)
-	draw_string(font, Vector2(700, 62), "Arrow marks its next cell", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("9eadae"))
+	draw_string(font, Vector2(700, 37), "WATCH. LEARN. MOVE.", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, TEAL)
+	draw_string(font, Vector2(700, 62), "Read the pursuer's behavior", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("9eadae"))
 	draw_string(font, Vector2(35, 88), status_message, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("bdc9c2"))
 
 func draw_footer() -> void:
@@ -264,14 +264,6 @@ func draw_end_overlay() -> void:
 	draw_string(font, Vector2(0, size.y * 0.47), heading, HORIZONTAL_ALIGNMENT_CENTER, size.x, 27, heading_color)
 	draw_string(font, Vector2(0, size.y * 0.47 + 34), status_message, HORIZONTAL_ALIGNMENT_CENTER, size.x, 14, Color("d3dbd6"))
 	draw_string(font, Vector2(0, size.y * 0.47 + 70), "PRESS R TO BEGIN AGAIN", HORIZONTAL_ALIGNMENT_CENTER, size.x, 12, Color("9eadae"))
-
-func diamond(center: Vector2, half_width: float, half_height: float) -> PackedVector2Array:
-	return PackedVector2Array([
-		center + Vector2(0, -half_height),
-		center + Vector2(half_width, 0),
-		center + Vector2(0, half_height),
-		center + Vector2(-half_width, 0)
-	])
 
 func draw_ellipse(center: Vector2, radius: Vector2, color: Color) -> void:
 	var points := PackedVector2Array()

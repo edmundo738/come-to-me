@@ -1,6 +1,6 @@
 # Come to Me
 
-A Godot 4 / GDScript prototype for a 2.5D isometric, turn-based survival adventure. This first slice deliberately focuses on a small playable foundation rather than future content.
+A Godot 4 / GDScript prototype for a 2.5D, screen-aligned grid survival adventure. This first slice deliberately focuses on a small playable foundation rather than future content. The camera is a shallow top-down view: the grid stays square to the screen, so logical up/down/left/right remain visually up/down/left/right.
 
 ## Open and play
 
@@ -13,7 +13,7 @@ A Godot 4 / GDScript prototype for a 2.5D isometric, turn-based survival adventu
    - **R** — restart at any time.
 4. Reach the teal gate. Gold fragments are optional. You have two shield charges.
 
-Blocked moves do not advance the world. A valid move, jump, or wait resolves the pursuer's already-visible intention. The red marker shows the cell it plans to enter on its next turn; stepping away can lure it into the cell you vacated. An impact consumes a shield and pushes the encounter back. A hit with no charges ends the run.
+Blocked moves do not advance the world. A valid move, jump, or wait resolves the pursuer's planned step. Its next cell is not marked: observe how it moves and learn its pursuit pattern. Moving away can lure it into the cell you vacated. An impact consumes a shield; a hit with no charges ends the run.
 
 ## Open it in the Godot editor
 
@@ -28,18 +28,18 @@ project.godot
 scenes/main.tscn
 scripts/
   main.gd          # run state, turn resolution, drawing and prototype UI
-  grid_world.gd    # logical map, walkability, isometric projection
+  grid_world.gd    # logical map, walkability, screen-aligned projection
   actor_state.gd   # shared logical actor position
   enemy_state.gd   # deterministic pursuit planning / intent
   input_router.gd  # device input -> logical actions
 ```
 
-The map and game rules use integer grid coordinates; projection and rendering are kept separate. Input is normalized at the boundary so new device bindings can feed the same logical actions. The current room is intentionally hand-authored and the first visual pass uses vector shapes drawn in GDScript—there are no external art assets or plugins.
+The map and game rules use integer grid coordinates; projection and rendering are kept separate. Input is normalized at the boundary so new device bindings can feed the same logical actions. The current room is intentionally hand-authored and the first visual pass uses vector shapes drawn in GDScript—there are no external art assets or plugins. Its screen-aligned cells, shallow depth treatment, and raised wall faces are a camera/readability prototype, not final art.
 
 ## Project status
 
-- **Implemented:** Godot project/scene, isometric grid rendering, player movement, turn-based enemy response and telegraphed intent, collision and limited shields, directional two-cell jump, wait, fragments, exit, win/game-over states, restart, adaptive viewport centering.
-- **Confirmed running by the project owner:** the project opens in Godot and the game is playable. The owner reported that the initial walls, perspective, and character art were hard to read; the latest pass simplifies the enemy marker, strengthens tile contrast, and redraws walls as aligned isometric blocks. Those visual changes still need a fresh in-editor check.
+- **Implemented:** Godot project/scene, screen-aligned shallow top-down grid, four-direction movement, turn-based enemy response with hidden internal planning, collision and limited shields, directional two-cell jump, wait, fragments, exit, win/game-over states, restart, adaptive viewport centering.
+- **Confirmed running by the project owner:** the project opens in Godot and the game is playable. The owner clarified the camera should not be classic diamond isometric and that enemy movement should be learned by observation, without a visible intent marker. The current pass follows those rules; its camera and wall-depth changes still need a fresh in-editor check.
 - **Working by code inspection:** the intended turn order, deterministic pursuit, and map path to the exit.
 - **Validated in this environment:** source changes pass `git diff --check`; the complete walkable map was checked for reachability. No Godot executable is available here to run the latest visual pass.
 - **Not in this slice:** touchscreen/controller/remote bindings, animations, sound, procedural maps, multiple levels/characters, narrative progression, and final art/UI.
