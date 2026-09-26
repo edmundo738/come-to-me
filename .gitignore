@@ -8,6 +8,10 @@ export.cfg
 export_credentials.cfg
 *.tmp
 
+# Python-generated caches
+__pycache__/
+*.py[cod]
+
 # Imported translations (automatically generated from CSV files)
 *.translation
 
