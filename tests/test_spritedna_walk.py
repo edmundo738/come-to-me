@@ -4,8 +4,8 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
-from spritedna_walk import FRAME_COUNT, frame_pose
+sys.path.insert(0, str(ROOT / "experiments/spritedna/walk_01_rejected"))
+from generator import FRAME_COUNT, frame_pose
 
 
 class SpriteDNAWalkTests(unittest.TestCase):

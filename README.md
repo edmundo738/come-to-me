@@ -21,7 +21,7 @@ If you currently only see the running game, close that game window first. In the
 
 To inspect the idle candidates separately, open `scenes/animation_review.tscn` and use **Run Current Scene (F6)**. Use **1–4** to select front/back/left/right, **Space** to pause, **Left/Right** to step while paused, **Up/Down** to adjust speed, and **R** to reset. The left/right loops are test candidates only, not approved production art.
 
-To test the new front-facing walk proof, open `scenes/walk_review.tscn` and use **F6**. It loads the 12-frame SpriteDNA experiment at gameplay scale; **Enter/Down** moves the root one cell smoothly while the gait plays, **Space** pauses/plays, **Left/Right** steps frames, and **R** resets. This walk is review-only and has not replaced or modified any idle/production sprite.
+The first SpriteDNA walk attempt was rejected by the user and is archived under `experiments/spritedna/walk_01_rejected/`; its source PNGs remain in the review folder as failure evidence. Do not use it as a gameplay animation. Open that folder's `index.html` in a browser (or serve the folder) to step the original PNGs without GIF accumulation. The original approved idle cycles and the main game are unchanged. A pipeline diagnosis and lossless APNG preview tool are documented in `docs/character-animation/sprite_pipeline_diagnosis.md`.
 
 This first playable prototype draws its board and gameplay characters from code, so the main Scene tree is intentionally sparse. Map walls, coins, player/enemy start cells, and the exit are currently specified in `scripts/grid_world.gd` and `scripts/main.gd`; they are not yet draggable objects in the 2D viewport. The main game now plays the four 12-frame protagonist idle cycles in place, selecting the latest facing direction: front/back use the provisional production-approved art, while left/right load review candidates 05/02 strictly for this test build (they are not promoted to final production art). `scenes/animation_review.tscn` remains a separate Godot `AnimatedSprite2D` scene for reviewing and stepping through the cycles. The game can be edited in the built-in script editor, but level placement still needs a future editor-friendly pass.
 
@@ -31,11 +31,10 @@ This first playable prototype draws its board and gameplay characters from code,
 project.godot
 scenes/main.tscn
 scenes/animation_review.tscn  # four-direction idle review scene
-scenes/walk_review.tscn       # isolated front-walk SpriteDNA preview
 scripts/
   animation_review.gd # idle review playback and frame controls
-  walk_review.gd      # review-only gait and one-cell root-motion preview
   main.gd             # run state, turn resolution, drawing and prototype UI
+experiments/spritedna/walk_01_rejected/ # archived, rejected walk attempt
   grid_world.gd    # logical map, walkability, screen-aligned projection
   actor_state.gd   # shared logical actor position
   enemy_state.gd   # deterministic pursuit planning / intent

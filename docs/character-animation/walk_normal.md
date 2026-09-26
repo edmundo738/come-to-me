@@ -1,16 +1,14 @@
 # Study 04 — WALK_NORMAL
 
-**Production dependency:** final four-direction walk production still waits for approved directional masters and a stable camera/pivot. By direct user request, an isolated front-facing proof is now authorized before those gates are complete; it remains review-only and must not be promoted automatically.
+**Production dependency:** final four-direction walk production still waits for approved directional masters and a stable camera/pivot. The user authorized one isolated front-facing proof; **experiment 01 was then rejected as visually unacceptable**. No walk sequence is currently approved for gameplay.
 **Emotional read:** ordinary, alert exploration with human weight.
-**Not in this study:** running, fear gait, root-motion baked into frames, scenery.
+**Not in this study:** running, fear gait, root-motion baked into PNG frames, scenery.
 
-## SpriteDNA experiment 01 — WALK_N_FRENTE (REVIEW ONLY)
+## SpriteDNA experiment 01 — WALK_N_FRENTE (REJECTED)
 
-A 12-frame deterministic proof was generated from the approved front idle master. Source: `characters/protagonist/animations/idle_normal/frente/frame_001.png` (read-only). Frames and technical reports are in `characters/protagonist/review/walk_n_frente_spritedna_01/`; preview scene: `scenes/walk_review.tscn`; generator: `tools/spritedna_walk.py`.
+A 12-frame experiment was generated from the approved front idle master (read-only). The PNGs and reports remain under `characters/protagonist/review/walk_n_frente_spritedna_01/`; the generator and test scene are archived in `experiments/spritedna/walk_01_rejected/`. The user judged the motion visually unacceptable; do not integrate or promote it.
 
-The experiment reuses the project's nearest-neighbour RGBA pipeline, adds a two-bone IK knee solve, alternating contact/lift targets, opposing arm swing and small pelvis/torso weight response. Root travel is deliberately separate: the review scene moves the character one grid cell over 0.48 seconds while the 12-frame gait loops at 12.5 FPS (0.96 seconds per two-step cycle). The preview is a technical/art review, not production promotion or proof of Godot execution in this environment.
-
-Initial technical check: 12 contiguous RGBA8 frames, common 384×544 canvas, no duplicate adjacent frames, no duplicate loop endpoint, no validator errors. The alpha bounds vary within the motion (width 168–178 px vs 172 px in the master; vertical bounds shift by at most 2 px); the validator reports these as warnings. These are measurable pose changes, not automatic evidence of good animation. Human review must still check planted-foot readability, limb warping, contact timing, loop quality at gameplay scale and face/identity stability. No source or approved idle frame was modified.
+The experiment used Gaussian-weighted inverse deformation over the flattened full-body raster. Bone-length assertions passed, but that does not establish good pixel-art motion. Measured alpha bounds varied (width 168–178 px vs 172 px in the master; height by up to 2 px), adjacent changed-pixel counts were 12,785–31,419, and the preview GIF had undefined frame disposal. The evidence and corrected preview workflow are documented in `sprite_pipeline_diagnosis.md`. Keep the existing idle/master assets unchanged; no new walk frames should be generated with this approach.
 
 ## Motion study
 

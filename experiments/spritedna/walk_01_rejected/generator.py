@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Generate a non-destructive SpriteDNA WALK_N_FRENTE review prototype.
+"""REJECTED SpriteDNA walk experiment 01 — retained for reproducibility only.
 
-This experiment deforms one approved front-facing master with a deterministic
-2D landmark rig. It never edits its input or writes into production folders.
-The resulting PNGs are experimental until the user approves the motion.
+The full-image raster warp changed too much of the source texture and produced
+unacceptable movement. Do not use this generator for production art. The input
+is read-only and the tool refuses to overwrite or write outside review folders.
 
 Usage:
-  python tools/spritedna_walk.py MASTER.png REVIEW_DIRECTORY
+  python experiments/spritedna/walk_01_rejected/generator.py MASTER.png REVIEW_DIRECTORY
 """
 from __future__ import annotations
 
@@ -16,7 +16,8 @@ import math
 import sys
 from pathlib import Path
 
-TOOLS = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[3]
+TOOLS = ROOT / "tools"
 sys.path.insert(0, str(TOOLS))
 from skeletal_idle import periodic_catmull_rom, warp_rgba_nearest, write_png_rgba8
 from validate_sprite_sequence import changed_pixels, measure, read_png_rgba8

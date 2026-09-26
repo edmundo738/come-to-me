@@ -1,6 +1,7 @@
 # Sprite sequence validation — characters/protagonist/review/walk_n_frente_spritedna_01/frames
 
 **Scope:** technical checks only; not an artistic approval.
+**Final visual status:** REJECTED by the user. A clean technical report did not predict acceptable motion; see `../../../../docs/character-animation/sprite_pipeline_diagnosis.md` for measured diagnosis.
 
 - Frames: 12 (minimum requested: 12)
 - Canvas: 384 × 544 px
