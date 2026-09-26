@@ -15,6 +15,12 @@ A Godot 4 / GDScript prototype for a 2.5D isometric, turn-based survival adventu
 
 Blocked moves do not advance the world. A valid move, jump, or wait resolves the pursuer's already-visible intention. The red marker shows the cell it plans to enter on its next turn; stepping away can lure it into the cell you vacated. An impact consumes a shield and pushes the encounter back. A hit with no charges ends the run.
 
+## Open it in the Godot editor
+
+If you currently only see the running game, close that game window first. In the **Godot Project Manager**, choose **Import**, select the repository's `project.godot` file, then select the project and click **Edit** (not **Run**). In the editor, `scenes/main.tscn` is in the **FileSystem** panel; double-click it to open the scene. The `scripts` folder contains the GDScript files; double-click a script to edit it.
+
+This first prototype draws its board and characters from code, so the Scene tree is intentionally sparse. Map walls, coins, player/enemy start cells, and the exit are currently specified in `scripts/grid_world.gd` and `scripts/main.gd`; they are not yet draggable objects in the 2D viewport. The game can be edited in the built-in script editor, but level placement still needs a future editor-friendly pass.
+
 ## Current structure
 
 ```text
@@ -33,8 +39,9 @@ The map and game rules use integer grid coordinates; projection and rendering ar
 ## Project status
 
 - **Implemented:** Godot project/scene, isometric grid rendering, player movement, turn-based enemy response and telegraphed intent, collision and limited shields, directional two-cell jump, wait, fragments, exit, win/game-over states, restart, adaptive viewport centering.
+- **Confirmed running by the project owner:** the project opens in Godot and the game is playable. The owner reported that the initial walls, perspective, and character art were hard to read; the latest pass simplifies the enemy marker, strengthens tile contrast, and redraws walls as aligned isometric blocks. Those visual changes still need a fresh in-editor check.
 - **Working by code inspection:** the intended turn order, deterministic pursuit, and map path to the exit.
-- **Validated in Godot:** not yet. This environment does not currently have a Godot executable available, so the project has not been launched or runtime-tested here. Please run it in Godot before treating the prototype as validated.
+- **Validated in this environment:** source changes pass `git diff --check`; the complete walkable map was checked for reachability. No Godot executable is available here to run the latest visual pass.
 - **Not in this slice:** touchscreen/controller/remote bindings, animations, sound, procedural maps, multiple levels/characters, narrative progression, and final art/UI.
 
 ## Development principle

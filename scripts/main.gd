@@ -3,15 +3,15 @@ extends Node2D
 const PLAYER_START := Vector2i(1, 1)
 const ENEMY_START := Vector2i(9, 1)
 const MAX_SHIELDS := 2
-const INK := Color("101923")
-const TILE_LIGHT := Color("293944")
-const TILE_DARK := Color("23323c")
-const WALL_TOP := Color("53636a")
-const WALL_LEFT := Color("34444d")
-const WALL_RIGHT := Color("40525b")
-const TEAL := Color("72e0cc")
-const GOLD := Color("f5c56b")
-const RED := Color("ef6d72")
+const TILE_LIGHT := Color("35434a")
+const TILE_DARK := Color("2b3940")
+const TILE_EDGE := Color("64747a")
+const WALL_TOP := Color("87918b")
+const WALL_LEFT := Color("4b5a60")
+const WALL_RIGHT := Color("637178")
+const TEAL := Color("78d8c4")
+const GOLD := Color("f2c66d")
+const RED := Color("f07178")
 
 var world: GridWorld
 var player: ActorState
@@ -159,15 +159,25 @@ func draw_floor_tile(center: Vector2, cell: Vector2i) -> void:
 	var points := diamond(center, GridWorld.TILE_WIDTH * 0.5, GridWorld.TILE_HEIGHT * 0.5)
 	var color := TILE_LIGHT if (cell.x + cell.y) % 2 == 0 else TILE_DARK
 	draw_colored_polygon(points, color)
-	draw_polyline(PackedVector2Array([points[0], points[1], points[2], points[3], points[0]]), Color(0.43, 0.57, 0.6, 0.24), 1.0, true)
+	# A full, consistent cell outline makes the movement grid easy to read.
+	draw_polyline(PackedVector2Array([points[0], points[1], points[2], points[3], points[0]]), TILE_EDGE, 1.35, true)
 
 func draw_wall(center: Vector2) -> void:
-	var top := center + Vector2(0, -20)
-	var top_points := diamond(top, GridWorld.TILE_WIDTH * 0.5, GridWorld.TILE_HEIGHT * 0.5)
-	draw_colored_polygon(PackedVector2Array([top_points[3], top_points[2], center + Vector2(36, 0), center + Vector2(0, 17), center + Vector2(-36, 0)]), WALL_LEFT)
-	draw_colored_polygon(PackedVector2Array([top_points[1], top_points[2], center + Vector2(36, 0), center + Vector2(0, 17)]), WALL_RIGHT)
-	draw_colored_polygon(top_points, WALL_TOP)
-	draw_line(top_points[0], top_points[1], Color(0.72, 0.8, 0.78, 0.32), 1.2)
+	# A single extruded isometric block: two side faces, then one top diamond.
+	# Keeping the base vertices aligned with the floor cell avoids the old
+	# skewed/overlapping wall shape.
+	var base := diamond(center, GridWorld.TILE_WIDTH * 0.5, GridWorld.TILE_HEIGHT * 0.5)
+	var top_center := center + Vector2(0, -38)
+	var top := diamond(top_center, GridWorld.TILE_WIDTH * 0.5, GridWorld.TILE_HEIGHT * 0.5)
+	var left_face := PackedVector2Array([top[3], top[2], base[2], base[3]])
+	var right_face := PackedVector2Array([top[2], top[1], base[1], base[2]])
+	draw_colored_polygon(left_face, WALL_LEFT)
+	draw_colored_polygon(right_face, WALL_RIGHT)
+	draw_colored_polygon(top, WALL_TOP)
+	var outline := Color("c1c7bd")
+	draw_polyline(PackedVector2Array([top[3], top[2], top[1], base[1], base[2], base[3], top[3]]), outline, 1.7, true)
+	# Simple material seam: reads as a solid block, not a strange floor marking.
+	draw_line(top[3] + Vector2(9, 5), top[2] + Vector2(-9, 5), Color("aeb8b0", 0.65), 1.0, true)
 
 func draw_coin(center: Vector2) -> void:
 	draw_circle(center + Vector2(0, -7), 8, Color(0.10, 0.12, 0.13, 0.5))
@@ -185,30 +195,43 @@ func draw_portal(center: Vector2) -> void:
 func draw_enemy_intent(from: Vector2, to: Vector2) -> void:
 	if from.distance_to(to) < 2:
 		return
-	draw_line(from + Vector2(0, -7), to + Vector2(0, -7), Color(RED, 0.72), 2.5, true)
-	var direction := (to - from).normalized()
-	var tip := to + Vector2(0, -7)
-	draw_line(tip, tip - direction.rotated(0.55) * 10, RED, 2.5, true)
-	draw_line(tip, tip - direction.rotated(-0.55) * 10, RED, 2.5, true)
-	draw_colored_polygon(diamond(to + Vector2(0, -1), 12, 6), Color(RED, 0.24))
+	# Mark only the destination cell; a long arrow crossing the board made the
+	# tactical picture noisy and obscured the grid.
+	var marker := to + Vector2(0, -1)
+	var points := diamond(marker, GridWorld.TILE_WIDTH * 0.5 - 5, GridWorld.TILE_HEIGHT * 0.5 - 3)
+	draw_colored_polygon(points, Color(RED, 0.24))
+	draw_polyline(PackedVector2Array([points[0], points[1], points[2], points[3], points[0]]), RED, 2.2, true)
+	draw_circle(to + Vector2(0, -9), 9, Color("311f27"))
+	draw_string(font, to + Vector2(-4, -5), "!", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("ffe4d8"))
 
 func draw_player(center: Vector2) -> void:
-	draw_ellipse(center + Vector2(0, 1), Vector2(16, 8), Color(0.02, 0.04, 0.06, 0.45))
-	draw_colored_polygon(PackedVector2Array([center + Vector2(-10, -13), center + Vector2(0, -19), center + Vector2(10, -13), center + Vector2(0, -7)]), Color("b8a27e"))
-	draw_colored_polygon(PackedVector2Array([center + Vector2(-10, -13), center + Vector2(0, -7), center + Vector2(0, 14), center + Vector2(-8, 7)]), Color("3f9d98"))
-	draw_colored_polygon(PackedVector2Array([center + Vector2(0, -7), center + Vector2(10, -13), center + Vector2(8, 7), center + Vector2(0, 14)]), Color("286b70"))
-	draw_circle(center + Vector2(0, -14), 3, Color("1b252b"))
-	draw_line(center + Vector2(-4, 14), center + Vector2(-5, 20), Color("b8a27e"), 3)
-	draw_line(center + Vector2(4, 14), center + Vector2(5, 20), Color("b8a27e"), 3)
-	draw_circle(center + Vector2(0, -24), 2.5, TEAL)
+	draw_ellipse(center + Vector2(0, 2), Vector2(17, 8), Color(0.02, 0.04, 0.06, 0.5))
+	# Boots and legs sit below the coat so the character has a clear upright read.
+	draw_line(center + Vector2(-4, 9), center + Vector2(-6, 19), Color("263239"), 5.0, true)
+	draw_line(center + Vector2(4, 9), center + Vector2(6, 19), Color("263239"), 5.0, true)
+	draw_line(center + Vector2(-6, 19), center + Vector2(-2, 20), Color("d0bd9a"), 3.0, true)
+	draw_line(center + Vector2(6, 19), center + Vector2(10, 20), Color("d0bd9a"), 3.0, true)
+	# Backpack, coat and arms give the player a recognizable explorer silhouette.
+	draw_colored_polygon(PackedVector2Array([center + Vector2(-11, -12), center + Vector2(-5, -16), center + Vector2(-4, 4), center + Vector2(-11, 2)]), Color("bd985b"))
+	draw_colored_polygon(PackedVector2Array([center + Vector2(-7, -14), center + Vector2(0, -18), center + Vector2(8, -13), center + Vector2(7, 7), center + Vector2(0, 13), center + Vector2(-7, 7)]), Color("428e88"))
+	draw_line(center + Vector2(-8, -8), center + Vector2(-13, 3), Color("d4ad79"), 4.0, true)
+	draw_line(center + Vector2(8, -8), center + Vector2(12, 2), Color("d4ad79"), 4.0, true)
+	draw_circle(center + Vector2(0, -22), 7, Color("c69f79"))
+	draw_arc(center + Vector2(0, -22), 7, PI, TAU, 16, Color("263239"), 4.0, true)
+	draw_circle(center + Vector2(2, -22), 1.2, Color("20262a"))
+	draw_circle(center + Vector2(0, -31), 2.5, TEAL)
 
 func draw_enemy(center: Vector2) -> void:
-	draw_ellipse(center + Vector2(0, 1), Vector2(17, 8), Color(0.02, 0.03, 0.05, 0.5))
-	draw_colored_polygon(PackedVector2Array([center + Vector2(-12, -13), center + Vector2(0, -20), center + Vector2(12, -13), center + Vector2(0, 8)]), Color("5c343e"))
-	draw_colored_polygon(PackedVector2Array([center + Vector2(-12, -13), center + Vector2(0, 8), center + Vector2(-4, 16), center + Vector2(-14, 4)]), Color("382630"))
-	draw_colored_polygon(PackedVector2Array([center + Vector2(12, -13), center + Vector2(0, 8), center + Vector2(4, 16), center + Vector2(14, 4)]), Color("472b35"))
-	draw_circle(center + Vector2(0, -12), 3, RED)
-	draw_circle(center + Vector2(-1, -13), 1, Color(1.0, 0.82, 0.71))
+	draw_ellipse(center + Vector2(0, 2), Vector2(18, 8), Color(0.02, 0.03, 0.05, 0.58))
+	# A hunched, hooded silhouette with two readable eyes; kept distinct from
+	# the player's warm face and teal coat.
+	draw_line(center + Vector2(-5, 6), center + Vector2(-9, 16), Color("382b35"), 5.0, true)
+	draw_line(center + Vector2(5, 6), center + Vector2(9, 15), Color("382b35"), 5.0, true)
+	draw_colored_polygon(PackedVector2Array([center + Vector2(-11, -11), center + Vector2(-6, -19), center + Vector2(0, -23), center + Vector2(7, -19), center + Vector2(12, -9), center + Vector2(9, 8), center + Vector2(2, 15), center + Vector2(-3, 9), center + Vector2(-10, 13), center + Vector2(-13, 2)]), Color("493541"))
+	draw_colored_polygon(PackedVector2Array([center + Vector2(-8, -11), center + Vector2(-4, -17), center + Vector2(4, -17), center + Vector2(9, -9), center + Vector2(5, -3), center + Vector2(-6, -3)]), Color("211e27"))
+	draw_circle(center + Vector2(-3, -9), 2.2, RED)
+	draw_circle(center + Vector2(4, -9), 2.2, RED)
+	draw_line(center + Vector2(-2, 1), center + Vector2(5, 6), Color("74515a"), 1.5, true)
 
 func draw_interface() -> void:
 	var width := get_viewport_rect().size.x
