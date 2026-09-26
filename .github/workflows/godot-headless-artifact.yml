@@ -18,11 +18,10 @@ on:
 permissions:
   contents: write
 
-timeout-minutes: 360
-
 jobs:
   build:
     runs-on: ubuntu-22.04
+    timeout-minutes: 360
     steps:
       - name: Check out the pinned project state
         uses: actions/checkout@v4
