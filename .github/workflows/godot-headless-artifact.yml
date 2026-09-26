@@ -11,6 +11,8 @@ on:
       - 'project.godot'
       - 'scenes/**'
       - 'scripts/**'
+      - 'experiments/**'
+      - 'tests/godot_evasion_experiment.gd'
       - 'characters/**'
       - 'art/**'
   workflow_dispatch:

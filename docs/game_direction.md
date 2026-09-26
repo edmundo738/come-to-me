@@ -21,11 +21,11 @@ Essa ordem é uma prioridade relativa, não uma percentagem nem três modos sepa
 
 Estes pontos descrevem o código do protótipo; não provam que o loop seja divertido, suficientemente tenso ou legível para novos jogadores.
 
-## Próximo passo recomendado — experiência isolada, não fórmula do jogo inteiro
+## Experiência implementada; teste humano pendente
 
-A pesquisa em `docs/gameplay_core_research.md` encontrou um bloqueador antes de avaliar diversão: a perseguição atual para numa parede na sala inicial. Primeiro corrigir o passo guloso com BFS determinístico; depois testar numa sala curta a hipótese **linha de visão → perseguição → perda de visão → procura da última posição → alívio**.
+A pesquisa em `docs/gameplay_core_research.md` encontrou um bloqueador antes de avaliar diversão: a perseguição atual pode parar numa parede. Para manter a experiência aditiva, o BFS e o ciclo **linha de visão → perseguição → perda de visão → investigação da última posição → procura breve → alívio** estão isolados em `experiments/evasion_first_slice/`; `scenes/main.tscn` e o `EnemyState` original permanecem como baseline.
 
-Usar paredes como oclusão e ações já existentes (mover, esperar, saltar); manter dois escudos e o fragmento opcional só como parâmetros do primeiro teste. Não adicionar botão de esconderijo, distrações, inventário ou Diretor dinâmico. Os parâmetros de alcance e duração da procura continuam experimentais. Critérios e observações estão no documento da pesquisa.
+A variante reutiliza ações existentes (mover, esperar, saltar), paredes, dois escudos e o fragmento. Não adiciona esconderijo, distrações, inventário ou Diretor dinâmico. Alcance, duração da procura e pista dos olhos são parâmetros provisórios. O smoke Godot headless passou, incluindo os 7.482 pares de pathfinding, transições e integração da cena; não confirma diversão nem legibilidade. O próximo passo é execução visual e playtest sem explicar a solução ao participante. Critérios estão em `docs/gameplay_core_research.md`.
 
 ## UNKNOWN / ainda não decidido
 

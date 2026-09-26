@@ -4,7 +4,7 @@
 
 **Escopo:** investigar o loop de evasão para o primeiro vertical slice, não escolher antecipadamente a estrutura do jogo completo.
 
-**Estado:** pesquisa consolidada; implementação recomendada abaixo é uma experiência reversível, não uma decisão final de género.
+**Estado:** pesquisa consolidada e checkpoint publicado; a primeira experiência reversível foi implementada. O smoke Godot headless e os testes de caminhos/transições passaram; revisão visual e playtest humano permanecem pendentes.
 
 ## Síntese executiva
 
@@ -16,7 +16,7 @@ A pesquisa favorece três propriedades:
 2. **Perseguição com memória limitada:** o inimigo reage ao que percebe, procura a última informação obtida e pode perder a pista. Uma ameaça pode ser imprevisível sem conhecer magicamente a posição atual do jogador.
 3. **Falha que altera a situação, sem encerrar imediatamente a tentativa:** ser visto ou cometer um erro deve impor custo e criar pressão, mas ainda permitir improvisação. A recuperação não pode reduzir-se a esconder-se à espera de um cronómetro ou reiniciar o encontro.
 
-**Recomendação concreta:** primeiro corrigir a perseguição que hoje falha em contornar paredes; depois construir uma cena de teste isolada com perceção por linha de visão, perseguição da posição visível, procura breve da última posição vista e um estado de alívio. Usar as paredes já existentes como oclusão, manter os dois escudos como único recurso explícito e comunicar os estados pelo comportamento/forma do perseguidor, sem um medidor de alerta. Sem esconderijos interativos, crafting, inventário, distrações por itens ou diretor dinâmico nesta experiência.
+**Hipótese concreta implementada para testar:** numa cena isolada, usar BFS para contornar paredes e experimentar perceção por linha de visão, perseguição da posição observada, procura breve da última posição vista e um estado de alívio. Usar paredes como oclusão, manter os dois escudos e comunicar estados pelo comportamento/forma do perseguidor, sem medidor de alerta. Sem esconderijos interativos, crafting, inventário, distrações por itens ou diretor dinâmico nesta experiência. Isto ainda não é uma decisão final de design.
 
 ## O que a evidência sugere
 
@@ -64,23 +64,25 @@ Um estudo académico sobre *Amnesia: The Dark Descent* analisa como espaço conf
 
 **CONSEQUÊNCIA:** o teste atual não é uma base fiável para julgar perseguição: na configuração inicial o inimigo pode parar na parede. Uma implementação de procura/linha de visão antes de corrigir rotas confundiria dois problemas.
 
-## Primeiro experimento de produção recomendado
+## Primeiro experimento de produção — implementado; headless validado
+
+A experiência aditiva está em `experiments/evasion_first_slice/`. É uma cena alternativa que conserva `scenes/main.tscn` como padrão e reutiliza os controlos, escudos, renderer e resolução de turnos existentes. O novo estado do perseguidor usa BFS determinístico; a cena principal e o `EnemyState` original continuam intactos. Os testes automatizados específicos estão em `tests/godot_evasion_experiment.gd` e foram ligados ao smoke suite.
 
 ### Parte A — tornar o movimento válido
 
-Substituir o passo guloso por BFS na grelha para obter um próximo passo de um caminho mínimo, preservando desempate determinístico. A sala tem somente 99 células; isto é simples, fácil de testar e suficiente — não há benefício demonstrado para navegação avançada. Teste objetivo: para todos os pares alcançáveis, o perseguidor progride e a distância restante diminui conforme o caminho mínimo; nenhuma rota válida deve parar numa parede.
+Implementado dentro da variante: BFS na grelha para obter um próximo passo de caminho mínimo, com ordem determinística direita/baixo/esquerda/cima. A sala tem somente 99 células, por isso não há benefício demonstrado para navegação avançada. **MEDIDO no smoke Godot 4.7.2 headless:** os 7.482 pares ordenados alcançáveis foram testados; 0 primeiros passos inválidos, todos reduzem a distância mínima em uma célula. O BFS permanece apenas na variante experimental e não substitui o comportamento da cena principal.
 
 ### Parte B — testar perseguição baseada em leitura
 
-Numa cena/variante de encontro isolada, manter uma única ameaça e adicionar somente:
+A cena isolada implementa, provisoriamente:
 
-1. **Persegue:** quando tem linha de visão desobstruída para o jogador, segue a posição observada pelo caminho mínimo.
-2. **Investiga/procura:** ao perder visão, guarda a última célula vista, desloca-se para lá e procura por um pequeno número configurável de ações do jogador. Se recuperar linha de visão, volta a perseguir.
-3. **Alívio:** se não reacquirir o jogador, interrompe a perseguição ativa/retorna a um ponto de guarda. O tempo é contado em turnos confirmados, nunca em segundos enquanto o jogador pensa.
+1. **Persegue:** visão em grelha sem bloqueio, alcance Chebyshev 6, e segue a posição observada pelo caminho mínimo.
+2. **Investiga/procura:** ao perder visão, guarda a última célula vista, desloca-se para lá e faz uma varredura visual de duas ações confirmadas. Se recuperar visão, volta a perseguir.
+3. **Alívio:** se não reacquirir o jogador, retorna pelo caminho válido ao ponto de partida/guarda. O tempo avança apenas com ações do jogador, nunca enquanto ele pensa.
 
-As paredes existentes podem bloquear a linha de visão no experimento; não é preciso botão de esconderijo. Dar início ao encontro com perseguidor visível e incluir uma obstrução que permita escolher entre uma rota exposta/curta e uma rota protegida/mais longa. Valores de alcance e duração são **parâmetros experimentais**, não valores aprovados; começar com uma procura curta e ajustá-la após jogo observado.
+A cena inicia com linha de visão e uma parede central permite quebrá-la ao mudar de rota. O código não dá conhecimento da posição oculta ao perseguidor. Mantém os dois escudos, um fragmento e a saída existente; não adiciona botão de esconderijo, distrações, inventário, áudio ou HUD. A orientação e a cor dos olhos mudam por estado como pista visual no mundo.
 
-Manter inicialmente os dois escudos e os fragmentos como estão. Usar sinais visuais simples do corpo/orientação e ritmo do inimigo para distinguir perseguição, investigação e alívio; evitar HUD novo. Sem áudio novo nesta primeira passagem: primeiro testar se o comportamento visual e a geometria explicam a causa. Se não, o playtest dirá qual pista está faltando.
+Alcance, duração, composição da sala e pista dos olhos são **parâmetros experimentais**, não valores aprovados. O smoke Godot headless passou, incluindo os caminhos exaustivos, o ciclo de estados e a integração da cena alternativa. A ferramenta headless não forneceu imagem legível; só revisão visual e playtest humano podem dizer se o encontro fica legível, interessante e justo.
 
 ### Critérios de playtest
 
@@ -100,7 +102,7 @@ Registar ações observadas e respostas do jogador, não só “gostei/não gost
 - **RECOMENDAÇÃO:** BFS + memória de última posição + linha de visão bloqueada por paredes é o experimento menor que ataca a falha medida e testa agência/recuperação/ambiente.
 - **NÃO É DECISÃO FINAL:** estes três estados não definem o jogo completo nem garantem que furtividade seja o núcleo final. O teste pode levar a simplificar, alterar ou remover a mecânica.
 - **UNKNOWN:** diversão, suspense, legibilidade visual do perseguidor e duração ideal da procura; precisam de playtest humano. A validação headless não confirma estética.
-- **LIMITAÇÃO ATUAL:** o checkout sincronizado não tem Godot no `PATH`. O CI headless do checkpoint anterior passou e publicou artefactos, mas download/restauração ainda não foi demonstrado; a revisão visual exige um ambiente com display.
+- **LIMITAÇÃO ATUAL:** Godot não está no `PATH`; foi reconstruído temporariamente em `/tmp` para executar a validação headless. O smoke não produziu captura visual e este binário não inclui display/GUI. O artefacto de Release/Actions continua sem download/restauração confirmados; a revisão visual exige um ambiente com display.
 
 ## Referências
 

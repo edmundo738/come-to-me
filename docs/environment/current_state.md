@@ -9,15 +9,17 @@ FACT:
 
 MEASURED:
 - Executable: 219,661,192 bytes; SHA-256 `db4cf162429ca0352be3b0a03125e111451c4130b9a078885ba68cf7fca23564`.
-- Clean source build: 34:16.39 in SCons; 2,078 seconds including source download, SCons setup and installation.
-- `tests/godot_headless_smoke.sh` passes: editor/import scan, PNG checks, runtime SpriteFrames, timed AnimatedSprite2D, TRES save/reload, main-scene integration, default-scene bounded startup, and animation-review scene startup.
+- Historical clean source build: 34:16.39 in SCons; 2,078 seconds including source download, SCons setup and installation.
+- This turn's pinned rebuild: SCons 31:00.63; 1,882 seconds including setup/install. Temporary executable `/tmp/come-to-me-godot-install/godot` is 219,661,192 bytes, SHA-256 `98348a419a384e00dadeb3f5573f70b1ffe2510518776a5758266537eadbd235`; binary remains outside Git.
+- This turn's `tests/godot_headless_smoke.sh` passes: editor/import scan, existing resource/animation suite, tactical-evasion suite, default-scene startup, and animation-review startup.
+- Tactical-evasion suite: all 7,482 reachable ordered room pairs take an optimal valid first step (0 failures); LOS loss, last-seen memory, bounded search, recovery, reacquisition, and alternate-scene turn integration pass.
 - All four 12-frame sequences are RGBA `384×544`; their individual durations match the configured values and each cycle totals 3.19 seconds.
 - Front source frames 001/002 differ in 2,449 of 208,896 pixels. This is file-level evidence only, not an art-quality judgment.
 - Locally prepared archive: 93,208,968 bytes; SHA-256 `60f5d7032e98ec9b87aa3e3debf4da78eaa879c6c0fd6b43755673f649edfb65`, outside Git. Separately, GitHub Release metadata confirms CI archive digest `sha256:cd9b82cc0a6836b71d2f0a18e24ceb986c7a40cd1a57769b0235b6cac4c1aef4`; do not conflate the two builds.
 
 OBSERVED:
-- Runtime ClassDB reports `CanvasItem.draw_ellipse(position, major, minor, color, filled, width, antialiased)`; the pre-fix Godot log said the local method signature did not match the parent. After the rename, the editor scan and both scenes run without script/resource errors.
-- Project import and headless resource tests produce no screenshot. `DisplayServer.get_name()` returns `headless`, the rendering adapter name is empty, and explicit `--rendering-driver opengl3` is rejected; only dummy rendering is offered.
+- Runtime ClassDB reports `CanvasItem.draw_ellipse(position, major, minor, color, filled, width, antialiased)`; the pre-fix Godot log said the local method signature did not match the parent. After the rename, the editor scan and main, animation-review, and evasion experiment scenes run without script/resource errors.
+- Project import and headless resource tests produce no screenshot. `DisplayServer.get_name()` returns `headless`, the rendering adapter name is empty, and explicit `--rendering-driver opengl3` is rejected; only dummy rendering is offered. The latest smoke again produced no screenshot artifact.
 - Godot generated 153 `.import` sidecars and 8 `.uid` files. `.godot/` is ignored cache and not committed.
 - A prior `/usr/local/bin/godot` installation vanished after workspace reset, confirming an out-of-repository binary is not durable by itself.
 - A GitHub draft Release exists. Direct `gh release upload` from the sandbox failed with TLS/EOF even for a 653-byte manifest.
@@ -43,14 +45,15 @@ UNKNOWN:
 
 CURRENT STATE:
 - At the start of this turn, local Git refs again showed `HEAD=a1ee6c2` while GitHub was at `5b20cbf`. Exact-content comparison found all 401 remote files present locally, with no missing, extra, or differing source files. The local ref was re-aligned by a mixed reset without replacing files. The reason this metadata reset recurs across turns is UNKNOWN.
-- The approved experience hierarchy is in `docs/game_direction.md`; focused research, code evidence and the proposed first experiment are in `docs/gameplay_core_research.md`.
-- The current workspace still has no Godot executable in `PATH`. CI build and headless smoke passed remotely and Release/Actions assets are published; download/restore remains unverified.
+- The fixed branch now contains the approved experience hierarchy, gameplay research, and the isolated first evasion experiment; details and limits are recorded in `docs/game_direction.md`, `docs/gameplay_core_research.md`, and `experiments/evasion_first_slice/`.
+- At this turn's start no Godot executable was available in `PATH`, and both GitHub Release/Actions binary downloads failed with TLS/EOF. A checksum-pinned Godot 4.7.2 headless source rebuild was completed to `/tmp/come-to-me-godot-install/godot` (not in Git, no editor GUI/display). The Godot smoke and tactical-evasion suite passed locally.
+- The evasion experiment's exhaustive grid check measured 7,482 reachable ordered pairs and 0 invalid first steps; line-of-sight/state transitions and alternate-scene integration also passed. No headless screenshot was produced.
 
 NEXT ACTION:
-- With the research checkpoint synchronized, implement the isolated first evasion experiment: correct grid pathfinding and test a visible-pursuit / last-seen-search loop. Use a working Godot binary only because it enables concrete game implementation and tests; do not expand recovery infrastructure beyond that need. Human visual playtest remains required.
+- Open `experiments/evasion_first_slice/evasion_first_slice.tscn` in a display-enabled Godot environment and observe a first-time player without explaining the intended route. Record whether they identify the initial sight, use a route change, interpret the last-seen search, and exploit or ignore the recovery window. Headless evidence cannot establish readability, fun, or art approval.
 
 LAST VERIFIED:
-- 2026-09-26 (workspace local time); eight Python unit tests and shell syntax checks pass in this workspace. Actions run `36269841970` completed all steps successfully. The Godot smoke suite passed on GitHub's runner; it has not been rerun in this workspace because `godot` is absent.
+- 2026-09-26 (workspace local time); pinned Godot `4.7.2.stable.custom_build` local headless smoke passes, including 7,482 BFS pairs and the evasion state/integration tests. Eight Python unit tests, shell syntax checks, and `git diff --check` pass. The headless run did not produce a screenshot; human visual playtest remains unperformed.
 
 CHECKPOINT POLICY:
 - The fixed branch `arena/01a0dda9-come-to-me` is the canonical checkpoint. Confirm its tip and worktree status from Git instead of duplicating a self-referential commit ID in this document.
