@@ -19,14 +19,29 @@ fi
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 
+emit_failure_annotations() {
+  local log="$1"
+  local label="$2"
+  [[ "${GITHUB_ACTIONS:-}" == "true" ]] || return 0
+  local excerpt
+  excerpt="$(grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:|GODOT_.*FAIL|FAIL' "$log" | grep -v 'Godot was compiled without fontconfig, system font support is disabled' | tail -n 12 || true)"
+  [[ -n "$excerpt" ]] || excerpt="$(tail -n 12 "$log")"
+  while IFS= read -r line; do
+    [[ -n "$line" ]] || continue
+    line="${line//%/%25}"
+    line="${line//:/%3A}"
+    echo "::error title=Godot smoke failure ($label)::$line"
+  done <<< "$excerpt"
+}
 fail_on_engine_errors() {
   local log="$1"
   local label="$2"
   local findings
   findings="$(grep -E 'SCRIPT ERROR:|Parse Error:|Failed to load script|ERROR:' "$log" | grep -v 'Godot was compiled without fontconfig, system font support is disabled' || true)"
   if [[ -n "$findings" ]]; then
-    printf '%s\n' "$findings"
+    echo "$findings"
     echo "ERROR: Godot reported an engine/script/resource error during $label" >&2
+    emit_failure_annotations "$log" "$label"
     return 1
   fi
 }
@@ -39,6 +54,7 @@ run_and_check() {
   if ! "$GODOT_BIN" "$@" >"$log" 2>&1; then
     cat "$log"
     echo "ERROR: $label exited unsuccessfully" >&2
+    emit_failure_annotations "$log" "$label"
     return 1
   fi
   if ! fail_on_engine_errors "$log" "$label"; then
