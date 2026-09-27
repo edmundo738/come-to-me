@@ -45,7 +45,7 @@ run_and_check() {
     cat "$log"
     return 1
   fi
-  grep -E 'GODOT_HEADLESS_SMOKE:|GODOT_EVASION_EXPERIMENT:|\[MEASURED\]|\[CONFIRMED\]|\[FACT\]|\[UNKNOWN\]' "$log" || true
+  grep -E 'GODOT_HEADLESS_SMOKE:|GODOT_EVASION_EXPERIMENT:|GODOT_PROCEDURAL_FIRST_LEVEL:|\[MEASURED\]|\[CONFIRMED\]|\[FACT\]|\[UNKNOWN\]' "$log" || true
   echo "[PASS] $label"
 }
 
@@ -54,6 +54,7 @@ run_and_check "project import and editor script scan" --headless --editor --path
 capture="$work/headless_capture.png"
 GODOT_SMOKE_CAPTURE="$capture" run_and_check "resource and animation smoke suite" --headless --path "$ROOT" --script res://tests/godot_headless_smoke.gd
 run_and_check "tactical evasion experiment" --headless --path "$ROOT" --script res://tests/godot_evasion_experiment.gd
+run_and_check "procedural first-level experiment" --headless --path "$ROOT" --script res://tests/godot_procedural_first_level.gd
 
 run_and_check "default gameplay scene" --headless --path "$ROOT" --quit-after 12
 run_and_check "animation_review scene" --headless --path "$ROOT" --quit-after 60 res://scenes/animation_review.tscn

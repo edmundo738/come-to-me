@@ -1,3 +1,26 @@
+## Update 2026-09-27 — isolated procedural environment slice
+
+FACT:
+- The owner approved the intermediate mixed 2.5D camera as an environmental development reference. This is not approval of concept illustrations, candidate textures, prop art, or final polish; `concepts/README.md` now records that distinction.
+- `experiments/procedural_first_level/` adds an F6-run alternate scene. It uses the existing player animation and turn-resolution code while generating seeded connected mazes, reachable pickups and exit, blocking walls/pillars, and walkable-only decals. A small experiment-only BFS pursuer prevents maze-corner stalls.
+- The default `scenes/main.tscn`, `scripts/main.gd`, `scripts/grid_world.gd`, character frame PNGs, and animation review/promotion workflow remain unchanged. Generated source images and processed candidate textures are kept in the isolated experiment; no candidate is approved production art.
+- The Gothic/chess experiment deliberately does not place the cable decal, which remains an isolated candidate for a future industrial theme. Some generated cutouts retain colored glow/fringing.
+
+MEASURED:
+- The generated texture candidates are small, grid-sized PNGs; cutout candidates report RGBA channels and transparent corners via ImageMagick. Their residual glow means a transparent corner alone is not a clean-edge/art-quality approval.
+- Existing Python tests: 8 passed. Shell syntax check and `git diff --check` passed.
+
+UNKNOWN:
+- Godot parsing, scene/resource import, the new 24-seed connectivity/collision test, actual in-engine behavior, and rendered appearance have not been verified in this workspace. No Godot executable is installed; downloading the existing headless Release asset ended with a TLS/EOF transfer error. The project remains headless-only here, with no human visual playtest.
+- Whether the generated maze and environmental candidates are readable, attractive, fair, and fun remains for display-enabled review.
+
+CURRENT EXPERIMENT PATHS:
+- Scene: `experiments/procedural_first_level/procedural_first_level.tscn` (F6 in Godot).
+- Technical test: `tests/godot_procedural_first_level.gd`, added to `tests/godot_headless_smoke.sh` for the next available pinned-engine run.
+- Full experiment notes and limitations: `experiments/procedural_first_level/README.md`.
+
+---
+
 # Current Godot environment state
 
 FACT:
