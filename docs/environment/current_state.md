@@ -11,7 +11,7 @@ MEASURED:
 - Existing Python tests: 8 passed. Shell syntax check and `git diff --check` passed.
 
 UNKNOWN:
-- Godot parsing, scene/resource import, the new 24-seed connectivity/collision test, actual in-engine behavior, and rendered appearance have not been verified in this workspace. No Godot executable is installed; downloading the existing headless Release asset ended with a TLS/EOF transfer error. The project remains headless-only here, with no human visual playtest.
+- Godot parsing, scene/resource import, the new 24-seed connectivity/collision test, actual in-engine behavior, and rendered appearance have not been verified in this workspace. No Godot executable is installed; downloading the existing headless Release asset ended with a TLS/EOF transfer error. The project remains headless-only here, with no human visual playtest. Remote pinned-engine CI run `36311764605` for commit `6a148319503ba3e31f081e160fde7cb6a2e28684` is currently building Godot; the smoke suite is pending.
 - Whether the generated maze and environmental candidates are readable, attractive, fair, and fun remains for display-enabled review.
 
 CURRENT EXPERIMENT PATHS:
