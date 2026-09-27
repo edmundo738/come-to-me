@@ -8,6 +8,7 @@ on:
       - '.github/workflows/godot-headless-artifact.yml'
       - 'tools/godot/**'
       - 'tests/godot_headless_smoke.*'
+      - 'tests/godot_visual_foundation.gd'
       - 'project.godot'
       - 'scenes/**'
       - 'scripts/**'

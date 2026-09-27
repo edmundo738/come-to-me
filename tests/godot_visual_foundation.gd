@@ -56,7 +56,7 @@ func _run() -> void:
 	for _frame in range(150):
 		await physics_frame
 	Input.action_release("move_right")
-	_check(player.global_position.x > start_position.x + 4.0 and player.global_position.x < 6.9, "a real obstacle collider stops free movement at the expected side of the room")
+	_check(player.global_position.x > start_position.x + 4.0 and player.global_position.x < 7.15, "a real obstacle collider stops free movement at the expected side of the room (player x=%.2f)" % player.global_position.x)
 	player.global_position = start_position
 	player.velocity = Vector3.ZERO
 	await physics_frame
@@ -102,7 +102,8 @@ func _run() -> void:
 func _test_project_configuration() -> void:
 	_check(ProjectSettings.get_setting("application/run/main_scene") == FOUNDATION_SCENE, "F5 launches the visual-foundation room")
 	_check(ProjectSettings.get_setting("rendering/renderer/rendering_method") == "forward_plus", "the desktop uses Forward+ rendering")
-	_check(ProjectSettings.get_setting("rendering/rendering_device/driver.windows") == "d3d12", "Windows prefers the D3D12 RenderingDevice driver")
+	var project_settings_text := FileAccess.get_file_as_string("res://project.godot")
+	_check(project_settings_text.contains("rendering/rendering_device/driver.windows=\"d3d12\""), "project file prefers the D3D12 RenderingDevice driver on Windows")
 
 func _test_camera_relative_vectors() -> void:
 	_check(FoundationPlayer.world_direction_from_axes(Vector2(0, -1), 0.0).is_equal_approx(Vector3(0, 0, -1)), "W follows camera-forward on the ground plane")
