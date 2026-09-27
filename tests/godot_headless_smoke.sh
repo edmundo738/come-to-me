@@ -45,11 +45,12 @@ run_and_check() {
     cat "$log"
     return 1
   fi
-  grep -E 'GODOT_HEADLESS_SMOKE:|GODOT_EVASION_EXPERIMENT:|GODOT_PROCEDURAL_FIRST_LEVEL:|GODOT_MANUAL_3D_ROOM:|\[MEASURED\]|\[CONFIRMED\]|\[FACT\]|\[UNKNOWN\]' "$log" || true
+  grep -E 'GODOT_HEADLESS_SMOKE:|GODOT_EVASION_EXPERIMENT:|GODOT_PROCEDURAL_FIRST_LEVEL:|GODOT_MANUAL_3D_ROOM:|GODOT_VISUAL_FOUNDATION:|\[MEASURED\]|\[CONFIRMED\]|\[FACT\]|\[UNKNOWN\]' "$log" || true
   echo "[PASS] $label"
 }
 
 run_and_check "project import and editor script scan" --headless --editor --path "$ROOT" --quit
+run_and_check "Checkpoint 01 visual foundation scene" --headless --path "$ROOT" --script res://tests/godot_visual_foundation.gd
 
 capture="$work/headless_capture.png"
 GODOT_SMOKE_CAPTURE="$capture" run_and_check "resource and animation smoke suite" --headless --path "$ROOT" --script res://tests/godot_headless_smoke.gd

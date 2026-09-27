@@ -1,0 +1,246 @@
+[gd_scene load_steps=14 format=3]
+
+[ext_resource type="Environment" path="res://experiments/visual_foundation/materials/room_environment.tres" id="1_environment"]
+[ext_resource type="PackedScene" path="res://experiments/visual_foundation/modules/floor_slab.tscn" id="2_floor"]
+[ext_resource type="PackedScene" path="res://experiments/visual_foundation/modules/stone_column.tscn" id="3_column"]
+[ext_resource type="PackedScene" path="res://experiments/visual_foundation/modules/wall_segment.tscn" id="4_wall"]
+[ext_resource type="PackedScene" path="res://experiments/visual_foundation/modules/low_obstacle.tscn" id="5_obstacle"]
+[ext_resource type="PackedScene" path="res://experiments/visual_foundation/modules/archway.tscn" id="6_arch"]
+[ext_resource type="PackedScene" path="res://experiments/visual_foundation/player.tscn" id="7_player"]
+[ext_resource type="PackedScene" path="res://experiments/visual_foundation/camera_rig.tscn" id="8_camera"]
+[ext_resource type="Material" path="res://experiments/visual_foundation/materials/limestone.tres" id="9_stone"]
+[ext_resource type="Material" path="res://experiments/visual_foundation/materials/teal_glaze.tres" id="10_teal"]
+[ext_resource type="Material" path="res://experiments/visual_foundation/materials/warm_inlay.tres" id="11_warm"]
+
+[sub_resource type="BoxMesh" id="PathLineMesh"]
+size = Vector3(0.055, 0.018, 19)
+
+[sub_resource type="BoxMesh" id="ThresholdLineMesh"]
+size = Vector3(5.4, 0.018, 0.08)
+
+[node name="VisualFoundation" type="Node3D"]
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
+environment = ExtResource("1_environment")
+
+[node name="KeyLight" type="DirectionalLight3D" parent="Environment"]
+rotation_degrees = Vector3(-51, -32, 0)
+light_color = Color(1, 0.82, 0.61, 1)
+light_energy = 1.1
+shadow_enabled = true
+directional_shadow_max_distance = 48.0
+
+[node name="SkyFill" type="OmniLight3D" parent="Environment"]
+position = Vector3(-4, 5, 1)
+light_color = Color(0.43, 0.63, 0.67, 1)
+light_energy = 0.72
+omni_range = 13.0
+shadow_enabled = false
+
+[node name="ThresholdGlow" type="OmniLight3D" parent="Environment"]
+position = Vector3(0, 3.25, -14.4)
+light_color = Color(0.13, 0.73, 0.67, 1)
+light_energy = 1.7
+omni_range = 8.0
+shadow_enabled = false
+
+[node name="Floor" parent="Environment" instance=ExtResource("2_floor")]
+
+[node name="Architecture" type="Node3D" parent="Environment"]
+
+[node name="SideWall_Left_00" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, -19)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Left_01" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, -14)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Left_02" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, -9)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Left_03" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, -4)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Left_04" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, 1)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Left_05" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, 6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Left_06" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, 11)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Left_07" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, 16)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Left_08" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-13.15, 0, 21)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_00" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, -19)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_01" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, -14)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_02" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, -9)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_03" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, -4)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_04" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, 1)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_05" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, 6)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_06" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, 11)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_07" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, 16)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="SideWall_Right_08" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(13.15, 0, 21)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EntryWall_Left_00" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-10, 0, 16.25)
+
+[node name="EntryWall_Left_01" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-5, 0, 16.25)
+
+[node name="EntryWall_Right_00" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(5, 0, 16.25)
+
+[node name="EntryWall_Right_01" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(10, 0, 16.25)
+
+[node name="FarWall_Left_00" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-10, 0, -16.25)
+
+[node name="FarWall_Left_01" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-5, 0, -16.25)
+
+[node name="FarWall_Right_00" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(5, 0, -16.25)
+
+[node name="FarWall_Right_01" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(10, 0, -16.25)
+
+[node name="NearEndWall_00" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-12.5, 0, 20.5)
+
+[node name="NearEndWall_01" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-7.5, 0, 20.5)
+
+[node name="NearEndWall_02" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-2.5, 0, 20.5)
+
+[node name="NearEndWall_03" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(2.5, 0, 20.5)
+
+[node name="NearEndWall_04" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(7.5, 0, 20.5)
+
+[node name="NearEndWall_05" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(12.5, 0, 20.5)
+
+[node name="FarEndWall_00" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-12.5, 0, -20.5)
+
+[node name="FarEndWall_01" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-7.5, 0, -20.5)
+
+[node name="FarEndWall_02" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(-2.5, 0, -20.5)
+
+[node name="FarEndWall_03" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(2.5, 0, -20.5)
+
+[node name="FarEndWall_04" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(7.5, 0, -20.5)
+
+[node name="FarEndWall_05" parent="Environment/Architecture" instance=ExtResource("4_wall")]
+position = Vector3(12.5, 0, -20.5)
+
+[node name="EntryArch" parent="Environment/Architecture" instance=ExtResource("6_arch")]
+position = Vector3(0, 0, 15.5)
+
+[node name="FarArch" parent="Environment/Architecture" instance=ExtResource("6_arch")]
+position = Vector3(0, 0, -14.8)
+
+[node name="Column_Left_Near" parent="Environment/Architecture" instance=ExtResource("3_column")]
+position = Vector3(-5.2, 0, 5.1)
+
+[node name="Column_Right_Near" parent="Environment/Architecture" instance=ExtResource("3_column")]
+position = Vector3(5.4, 0, 3.7)
+
+[node name="Column_Left_Middle" parent="Environment/Architecture" instance=ExtResource("3_column")]
+position = Vector3(-4.6, 0, -3.2)
+
+[node name="Column_Right_Middle" parent="Environment/Architecture" instance=ExtResource("3_column")]
+position = Vector3(4.5, 0, -5.6)
+
+[node name="Column_Left_Far" parent="Environment/Architecture" instance=ExtResource("3_column")]
+position = Vector3(-8.1, 0, -10.2)
+
+[node name="Column_Right_Far" parent="Environment/Architecture" instance=ExtResource("3_column")]
+position = Vector3(8.1, 0, -9.1)
+
+[node name="Obstacle_Left_Near" parent="Environment/Architecture" instance=ExtResource("5_obstacle")]
+position = Vector3(-8.2, 0, 4.7)
+
+[node name="Obstacle_Right_Near" parent="Environment/Architecture" instance=ExtResource("5_obstacle")]
+position = Vector3(8.1, 0, 7.3)
+
+[node name="Obstacle_Left_Far" parent="Environment/Architecture" instance=ExtResource("5_obstacle")]
+position = Vector3(-8.2, 0, -4.4)
+
+[node name="Obstacle_Right_Far" parent="Environment/Architecture" instance=ExtResource("5_obstacle")]
+position = Vector3(8.1, 0, -2.6)
+
+[node name="DecorativeInlays" type="Node3D" parent="Environment"]
+
+[node name="PathLineLeft" type="MeshInstance3D" parent="Environment/DecorativeInlays"]
+position = Vector3(-1.65, 0.014, -2.0)
+mesh = SubResource("PathLineMesh")
+material_override = ExtResource("11_warm")
+
+[node name="PathLineRight" type="MeshInstance3D" parent="Environment/DecorativeInlays"]
+position = Vector3(1.65, 0.014, -2.0)
+mesh = SubResource("PathLineMesh")
+material_override = ExtResource("11_warm")
+
+[node name="EntryLine" type="MeshInstance3D" parent="Environment/DecorativeInlays"]
+position = Vector3(0, 0.014, 10)
+mesh = SubResource("ThresholdLineMesh")
+material_override = ExtResource("10_teal")
+
+[node name="FarThresholdLine" type="MeshInstance3D" parent="Environment/DecorativeInlays"]
+position = Vector3(0, 0.014, -12.0)
+mesh = SubResource("ThresholdLineMesh")
+material_override = ExtResource("10_teal")
+
+[node name="Player" parent="." instance=ExtResource("7_player")]
+position = Vector3(0, 0, 8)
+
+[node name="CameraRig" parent="." instance=ExtResource("8_camera")]

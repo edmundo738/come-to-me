@@ -7,7 +7,7 @@ An additive, hand-authored room for testing **3D environment + 2D characters**. 
 1. In the Godot editor, open `manual_3d_room.tscn` from this folder.
 2. Select nodes under `Environment/Floor`, `Environment/Walls`, `Environment/Props`, `Environment/Decals`, `Environment/Doors`, `Gameplay`, or `CameraRig` in the Scene tree.
 3. Change MeshInstance3D meshes/materials, move individual wall/pillar instances, adjust the red resin plane, move either character, or experiment with the Camera3D transform/projection.
-4. Run this scene with **F6**. Project **F5** still runs the preserved 2D main scene.
+4. Run this scene with **F6**. Project **F5** now runs Checkpoint 01 at `experiments/visual_foundation/foundation_room.tscn`; this earlier room remains a separate technical proof.
 
 `WallCell` and `PillarCell` are reusable scenes with real StaticBody3D collision. `GridCellMarker3D` snaps their X/Z transform to the one-metre grid and updates the exported `grid_cell`; the room controller reads blockers from these visible instances at startup. Keep room layout under the identity `ComeToMeWorld` root so world position, physics, and cell coordinates stay aligned. Moving an instance in the editor changes both its visible/collision placement and its logical blocked cell.
 

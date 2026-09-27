@@ -1,6 +1,6 @@
 # Procedural first level — isolated experiment
 
-This is an additive, reversible environment slice. Run `experiments/procedural_first_level/procedural_first_level.tscn` in Godot with **F6**. The project default remains `scenes/main.tscn`; the production world, player animation frames, animation review scene, and rejected animation candidates are not changed.
+This is an additive, reversible environment slice. Run `experiments/procedural_first_level/procedural_first_level.tscn` in Godot with **F6**. At the time this experiment was recorded, the project default was `scenes/main.tscn`; since 2026-09-27 the default is Checkpoint 01 at `experiments/visual_foundation/foundation_room.tscn`. This experiment's source and assets remain preserved and unchanged.
 
 ## What it tests
 

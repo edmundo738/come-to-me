@@ -1,26 +1,33 @@
-## Update 2026-09-27 — pivot to one editable 3D room
+# Current workspace state — 2026-09-27
 
-FACT:
-- The owner’s playtest of the procedural slice found it not fun, scary, or visually coherent; the room read as PNGs in an arena, with mismatched depth, teleport-like movement, and little sense of a grounded world. The report is preserved in `experiments/procedural_first_level/README.md` as owner-observed evidence. The procedural experiment and its assets remain untouched as evidence, not the next production base.
-- `experiments/manual_3d_room/manual_3d_room.tscn` is the next additive prototype: a hand-built 11×9 room with editable Floor/Walls/Props/Decals/Doors, Gameplay actors, and CameraRig. Walls/pillars are separate collision-backed scene instances; their grid occupancy is read from the same nodes that form the visible room.
-- The room directly reuses `EvasionEnemyState` and its existing sight → pursuit → investigation → search → recovery transitions. No new enemy AI system is introduced. Player movement is physical `CharacterBody3D` travel; each grid-boundary crossing advances one enemy unit. A sub-cell movement test is added.
-- The main scene, procedural experiment, animation frames, and rejected walk candidate remain unchanged. The room is not set as the project default and is not approved as final art.
-- The new 3D camera angle, orthographic projection, material palette, tiny movement bob, and static statue silhouette are hypotheses for the test room. Player side-facing idle sequences remain review candidates; the rejected walk asset is not used.
+## FACT
+- Checkpoint 01 is now `experiments/visual_foundation/foundation_room.tscn`; `project.godot` selects it as the F5 main scene. `scenes/main.tscn` and `experiments/manual_3d_room/` remain preserved, not deleted or overwritten.
+- The new scene is deliberately visual-only: editable 3D floor/architecture/props/collisions, WorldEnvironment, lights/shadows, a free 3D player controller and mouse-orbit Camera3D. It contains no enemies, stealth, combat, audio, HUD, turns/cells, or procedural content.
+- The character implementation is a reversible visual hypothesis: existing separate PNG idle frames in an `AnimatedSprite3D`, a real CharacterBody3D capsule, lighting, alpha-cut shadow and contact shadow. The left/right frames remain review candidates; no rejected walk is used.
+- `project.godot` selects Forward+ and explicitly requests `d3d12` on Windows with Godot 4.7 project features. This configuration has not been tested on Windows hardware.
 
-OBSERVED:
-- The workspace Git metadata had reset to the initial commit. A byte-for-byte comparison found all 446 remote files present and identical, with no extras or differences; `git reset --mixed` safely aligned the branch to `5dd5fa4` without replacing files.
-- Remote Actions run `36311764605` built the pinned Godot binary, then failed during the headless smoke step. Downloading the log failed with TLS/EOF. The failing test and cause are UNKNOWN; the procedural test must not be reported as passing.
+## MEASURED / OBSERVED
+- The local source tree matched every path and byte in remote branch `arena/01a0dda9-come-to-me` at `7f6ba41`; zero local-only files were found. A non-destructive mixed ref alignment brought local HEAD to that remote tip before implementation.
+- No Godot executable, X server, Wayland compositor, Xvfb, or graphical display backend is available in this workspace. A filesystem search found no Godot binary. Debian package-index refresh and downloads from GitHub Release assets failed because the sandbox connection ended/failed during TLS/EOF.
+- The earlier run `36315052254` built the pinned engine then failed during its headless smoke step; retrieving logs failed with TLS/EOF. The failing subtest/cause remain UNKNOWN.
+- Static validation here: `bash -n tests/godot_headless_smoke.sh` passed; all 8 Python tests passed; 15 new `.tscn`/`.tres` files have existing resource paths and consistent `load_steps`; all three generated 64×64 PNGs passed CRC/decompression checks; `git diff --check` passed.
+- The new GDScript test has not been executed because no Godot executable is present. No GDScript parse, Godot import, physics runtime, mouse test, GUI/gameplay observation, or visual review has occurred in this turn.
 
-UNKNOWN:
-- Godot parse/import, scene instantiation, collisions, continuous movement, the re-used Evasion First integration, and all rendered appearance of the new room. No editor executable is available locally; no visual review has happened.
-- Whether the proposed angle and ortho camera preserve immediate cardinal movement reading; whether the billboarded characters look grounded; whether the gentle bob makes movement feel like walking; whether this hand-built situation is strategic, tense, or fun.
+## UNKNOWN
+- Whether the new project imports/parses and the 3D scene runs in Godot; actual CharacterBody collision, mouse capture/orbit, camera collision compression, Forward+ rendering, Direct3D 12 preference, shadows, and pixel texture import.
+- Whether the character reads as a spatial 2D/2.5D figure rather than a card/sprite pasted into the world; whether movement glides; whether the framing, scale, depth and lighting belong together; and whether the experience is comfortable/beautiful.
+- The visual checkpoint is **not approved** until a display-backed run is observed. A headless pass can validate resources/math/physics scripts only, not the visual acceptance criterion.
 
-NEXT:
-- Open `experiments/manual_3d_room/manual_3d_room.tscn` in Godot and run the current scene (F6). Review camera/scale first, then play a first-time movement and sight-loss test. Only adjust what the observation demonstrates; do not add new mechanics or content before this room answers the core question.
+## NEXT
+Run `experiments/visual_foundation/foundation_room.tscn` in a display-enabled Godot 4.7.2 environment, move W/S/A/D and diagonals, orbit and zoom the camera, test a pillar occlusion and wall collision, then record objective visual failures before calling the checkpoint done. Do not add any future gameplay systems to this pass.
 
 ---
 
-# Current Godot environment state
+# Historical record
+
+The following dated notes preserve evidence from the previous procedural/evasion/manual-room checkpoint. They are historical, not the current project direction.
+
+# Historical headless recovery log (superseded; retained as evidence)
 
 
 FACT:

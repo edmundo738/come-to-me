@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Material" path="res://experiments/visual_foundation/materials/stone_wall.tres" id="1_wall"]
+[ext_resource type="Material" path="res://experiments/visual_foundation/materials/warm_inlay.tres" id="2_trim"]
+
+[sub_resource type="BoxMesh" id="WallMesh"]
+size = Vector3(5, 4.4, 0.75)
+
+[sub_resource type="BoxMesh" id="TopTrimMesh"]
+size = Vector3(5.1, 0.12, 0.82)
+
+[sub_resource type="BoxShape3D" id="WallCollision"]
+size = Vector3(5, 4.4, 0.75)
+
+[node name="WallSegment" type="StaticBody3D" groups=["visual_occluders"]]
+collision_layer = 1
+collision_mask = 1
+
+[node name="PixelStoneWall" type="MeshInstance3D" parent="."]
+position = Vector3(0, 2.2, 0)
+mesh = SubResource("WallMesh")
+material_override = ExtResource("1_wall")
+
+[node name="TopTrim" type="MeshInstance3D" parent="."]
+position = Vector3(0, 4.42, 0)
+mesh = SubResource("TopTrimMesh")
+material_override = ExtResource("2_trim")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 2.2, 0)
+shape = SubResource("WallCollision")
