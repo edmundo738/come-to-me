@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://experiments/visual_foundation/foundation_player.gd" id="1_player"]
 [ext_resource type="Material" path="res://experiments/visual_foundation/materials/contact_shadow.tres" id="2_shadow_material"]
-[ext_resource type="Texture2D" path="res://characters/protagonist/animations/idle_normal/frente/frame_001.png" id="3_editor_preview"]
+[ext_resource type="Texture2D" path="res://characters/protagonist/animations/idle_normal/tras/frame_001.png" id="3_editor_preview"]
 
 [sub_resource type="CapsuleShape3D" id="PlayerCapsule"]
 radius = 0.24

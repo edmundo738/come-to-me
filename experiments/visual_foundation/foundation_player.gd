@@ -3,9 +3,9 @@ extends CharacterBody3D
 
 const FRAME_DURATIONS := [0.27, 0.25, 0.25, 0.25, 0.27, 0.30, 0.30, 0.30, 0.25, 0.25, 0.25, 0.25]
 const DIRECTION_PATHS := {
-	# This folder shows the protagonist from behind, which is what the trailing camera sees while W is held.
-	"AWAY": "res://characters/protagonist/animations/idle_normal/frente/",
-	"TOWARD": "res://characters/protagonist/animations/idle_normal/tras/",
+	# AWAY moves from the trailing camera: use the back view. TOWARD moves into it: use the front view.
+	"AWAY": "res://characters/protagonist/animations/idle_normal/tras/",
+	"TOWARD": "res://characters/protagonist/animations/idle_normal/frente/",
 	"LEFT": "res://characters/protagonist/review/idle_n_esquerda_skeleton_05/frames/",
 	"RIGHT": "res://characters/protagonist/review/idle_n_direita_skeleton_02/frames/",
 }

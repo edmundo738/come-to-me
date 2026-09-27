@@ -45,6 +45,10 @@ func _run() -> void:
 	if sprite != null and sprite.sprite_frames != null:
 		for view in ["AWAY", "TOWARD", "LEFT", "RIGHT"]:
 			_check(sprite.sprite_frames.has_animation(view) and sprite.sprite_frames.get_frame_count(view) == 12, "%s view preserves 12 individual source frames" % view)
+		var away_texture: Texture2D = sprite.sprite_frames.get_frame_texture("AWAY", 0) if sprite.sprite_frames.get_frame_count("AWAY") > 0 else null
+		var toward_texture: Texture2D = sprite.sprite_frames.get_frame_texture("TOWARD", 0) if sprite.sprite_frames.get_frame_count("TOWARD") > 0 else null
+		_check(away_texture != null and away_texture.resource_path.contains("/idle_normal/tras/"), "the trailing camera sees the protagonist back while moving away")
+		_check(toward_texture != null and toward_texture.resource_path.contains("/idle_normal/frente/"), "the protagonist front faces the camera while moving toward it")
 
 	_check(player.is_on_floor(), "player settles onto the physical floor")
 	var start_position := player.global_position
