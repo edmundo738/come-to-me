@@ -1,31 +1,55 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Material" path="res://experiments/visual_foundation/materials/limestone.tres" id="1_stone"]
-[ext_resource type="Material" path="res://experiments/visual_foundation/materials/teal_glaze.tres" id="2_trim"]
+[ext_resource type="Material" path="res://experiments/visual_foundation/materials/warm_inlay.tres" id="2_trim"]
 
-[sub_resource type="BoxMesh" id="BlockMesh"]
-size = Vector3(2.6, 0.92, 1.15)
+[sub_resource type="BoxMesh" id="SeatMesh"]
+size = Vector3(2.5, 0.18, 0.86)
 
-[sub_resource type="BoxMesh" id="CapMesh"]
-size = Vector3(2.72, 0.12, 1.22)
+[sub_resource type="BoxMesh" id="SupportMesh"]
+size = Vector3(0.42, 0.66, 0.68)
 
-[sub_resource type="BoxShape3D" id="BlockCollision"]
-size = Vector3(2.6, 0.92, 1.15)
+[sub_resource type="BoxMesh" id="ApronMesh"]
+size = Vector3(1.36, 0.18, 0.16)
 
-[node name="LowObstacle" type="StaticBody3D" groups=["visual_occluders"]]
+[sub_resource type="BoxShape3D" id="SeatCollision"]
+size = Vector3(2.5, 0.18, 0.86)
+
+[sub_resource type="BoxShape3D" id="SupportCollision"]
+size = Vector3(0.42, 0.66, 0.68)
+
+[node name="StoneBench" type="StaticBody3D" groups=["visual_occluders"]]
 collision_layer = 1
 collision_mask = 1
 
-[node name="StoneBlock" type="MeshInstance3D" parent="."]
-position = Vector3(0, 0.46, 0)
-mesh = SubResource("BlockMesh")
+[node name="Seat" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.75, 0)
+mesh = SubResource("SeatMesh")
 material_override = ExtResource("1_stone")
 
-[node name="Cap" type="MeshInstance3D" parent="."]
-position = Vector3(0, 0.96, 0)
-mesh = SubResource("CapMesh")
+[node name="LeftSupport" type="MeshInstance3D" parent="."]
+position = Vector3(-0.84, 0.33, 0)
+mesh = SubResource("SupportMesh")
+material_override = ExtResource("1_stone")
+
+[node name="RightSupport" type="MeshInstance3D" parent="."]
+position = Vector3(0.84, 0.33, 0)
+mesh = SubResource("SupportMesh")
+material_override = ExtResource("1_stone")
+
+[node name="FrontApron" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.57, 0.43)
+mesh = SubResource("ApronMesh")
 material_override = ExtResource("2_trim")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-position = Vector3(0, 0.46, 0)
-shape = SubResource("BlockCollision")
+[node name="SeatCollision" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.75, 0)
+shape = SubResource("SeatCollision")
+
+[node name="LeftSupportCollision" type="CollisionShape3D" parent="."]
+position = Vector3(-0.84, 0.33, 0)
+shape = SubResource("SupportCollision")
+
+[node name="RightSupportCollision" type="CollisionShape3D" parent="."]
+position = Vector3(0.84, 0.33, 0)
+shape = SubResource("SupportCollision")

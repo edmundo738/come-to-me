@@ -1,6 +1,6 @@
 # Come to Me
 
-Exploration-first game prototype in Godot: a real 3D world with a pixel-art/2.5D presentation. The long-term direction keeps stealth, mystery, survival and strategy together; the **current executable test is only Checkpoint 01 — Visual Foundation**.
+Exploration-first game prototype in Godot: a real 3D world with a pixel-art/2.5D presentation. The long-term direction keeps stealth, mystery, survival and strategy together; the **current executable test remains Checkpoint 01 — Visual Foundation, now in Iteration 02**.
 
 ## Run Checkpoint 01
 
@@ -13,14 +13,14 @@ Open `project.godot` in Godot **4.7.2** and press **F5**. The default scene is `
 - **Mouse wheel:** move the camera closer/farther.
 - **Esc:** release/capture the pointer; click the game view to capture it again.
 
-The player moves freely on the floor plane with physical collision. The camera follows behind and above, eases with movement, and shortens its path when geometry blocks it. This is a first camera test, not the final cinematic camera system.
+The player moves freely on the floor plane with physical collision. Horizontal velocity eases toward a camera-relative target, and the body turns toward its heading instead of snapping. The camera's orbit, follow, position and collision-distance responses are damped independently. This is a second-feel pass, not a final cinematic camera system; its results still need the owner's playtest.
 
 ## Edit the room
 
 Open `experiments/visual_foundation/foundation_room.tscn` in the editor. It is built from editable Godot nodes and reusable scenes, not a world painted with `draw_*()`:
 
 - `Environment/Floor` — mesh floor and physics collider.
-- `Environment/Architecture` — separate wall segments, archways, columns and low obstacles; each reusable piece contains its meshes/materials and `StaticBody3D` collision.
+- `Environment/Architecture` — separate wall segments, threshold frames, columns and a single stone bench; each reusable piece contains editable meshes/materials and `StaticBody3D` collision.
 - `Environment/DecorativeInlays` — simple editable geometry details.
 - `Environment/WorldEnvironment`, `KeyLight`, fill and threshold lights — real 3D environment and lighting.
 - `Player` — `CharacterBody3D`, capsule collision, contact shadow and individual PNG idle frames in `AnimatedSprite3D`.
@@ -30,18 +30,19 @@ Meshes, collisions, transforms, materials, camera settings and lights can be cha
 
 ## Checkpoint scope and status
 
-**In the scene:** one small manually composed 3D test chamber, free camera-relative ground movement, mouse orbit/zoom, lighting, shadows, depth, collision and the protagonist's existing pixel-art idle views. A small movement bob is temporary; it does not claim to be a walk animation.
+**In the scene:** one manually composed 3D test chamber, free camera-relative ground movement, mouse orbit/zoom, lighting, shadows, depth, collision and the protagonist's existing pixel-art idle views. Iteration 02 tunes camera damping, velocity/turn response, and a small velocity-driven settle; it does not introduce a new walk cycle.
 
 **Deliberately not in this checkpoint:** enemies, statues, demons, Mirrors, Shadows, Reflections, stealth/Shift, combat, throwables, sound, breathing/heartbeat, HUD, progression, turn/cell gameplay, procedural generation or open-world systems. Those remain future direction, not scope creep for this visual proof.
 
-**The character technique is not a final decision.** The first reversible test uses a Y-facing `AnimatedSprite3D` lit by the 3D scene, an alpha-cut sprite shadow and a contact shadow. Front/back idle frames are the existing approved art; side views remain review candidates. The rejected walk sequence is not used. Whether this figure feels voluminous, grounded and spatially integrated is still UNKNOWN until observed in a display-backed run.
+**The character technique is not a final decision.** The reversible test uses a Y-facing `AnimatedSprite3D` lit by the 3D scene, an alpha-cut sprite shadow and a contact shadow. Front/back idle frames are the existing approved art; side views remain review candidates. The rejected walk sequence is not used. In the owner's first display-backed run the perspective felt promising, but full spatial integration and camera comfort still need further playtests.
 
-### Validation
+### First playtest and next validation
 
-- `tests/godot_visual_foundation.gd` exercises the scene tree, input-vector math, free movement, physical floor/obstacle collisions and camera behavior where the display driver permits it.
-- The pinned Godot source build used by CI is 4.7.2. This local workspace has no Godot executable or GUI/display backend. Static checks and headless tests do **not** establish the required visual result.
-- Previous Actions run `36315052254` compiled Godot but failed during its headless smoke step; the log download failed with TLS/EOF, so the failing subtest is UNKNOWN. A fresh run is still needed. Even a headless PASS cannot approve camera comfort or character/world integration.
-- **Checkpoint 01 is not declared visually successful yet.** It requires a real playtest and an observed answer to: “Does the character feel present in the world, and do camera, movement, character and environment belong together?”
+- **FACT — owner ran Iteration 01 in Godot.** **OBSERVED:** free 3D movement works as a first proof; the player perspective is promising; the room composition suggests an interesting temple-like space. **OBSERVED:** proportions and blockout assets look artificial/geometric, motion is stiff, orbit/framing need substantial refinement, and camera transitions must not announce a hard boundary. The complete report and next checkpoint scope are in `docs/game_direction.md`.
+- Iteration 02 addresses only camera/character feel and visual coherence: damped orbit/follow/obstruction response, acceleration/braking and smoothed body turn, stable source-view selection, rounder repeated architecture, fewer props, and a restrained palette/light cue. It adds no gameplay systems or particle effects.
+- Remote headless run `36328344782` built the pinned Godot and imported/executed the scene test, but one bench-collision assertion failed at X=7.63. The collision test is being aligned to the bench center and the block is being reshaped as a bench; this must be re-run, not assumed fixed.
+- Static checks and headless tests do **not** establish art quality, comfort or spatial integration. This workspace has no desktop Godot executable/display, so only the owner can provide the next actual visual playtest here.
+- **Iteration 02 is not approved yet.** The user's five evaluation questions remain open until the updated folder is run and observed.
 
 ## Preserved experiments and evidence
 

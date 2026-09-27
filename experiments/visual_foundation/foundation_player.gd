@@ -12,21 +12,21 @@ const DIRECTION_PATHS := {
 
 @export_node_path("Node3D") var camera_rig_path: NodePath = ^"../CameraRig"
 @export_range(1.0, 8.0, 0.1) var move_speed := 3.2
-@export_range(1.0, 24.0, 0.5) var ground_acceleration := 13.0
-@export_range(1.0, 24.0, 0.5) var ground_deceleration := 16.0
+@export_range(1.0, 24.0, 0.5) var ground_acceleration := 8.0
+@export_range(1.0, 24.0, 0.5) var ground_deceleration := 10.0
+@export_range(1.0, 18.0, 0.5) var turn_response := 7.5
 
 @onready var camera_rig = get_node(camera_rig_path)
 @onready var animated_sprite: AnimatedSprite3D = $VisualRoot/AnimatedSprite3D
 @onready var visual_root: Node3D = $VisualRoot
 
 var last_world_direction := Vector3(0.0, 0.0, -1.0)
-var _sprite_rest_height := 0.696
 var _gait_phase := 0.0
+var _forward_view_axis := true
 
 func _ready() -> void:
 	floor_snap_length = 0.25
 	floor_max_angle = deg_to_rad(48.0)
-	_sprite_rest_height = animated_sprite.position.y
 	animated_sprite.sprite_frames = _build_sprite_frames()
 	animated_sprite.visible = true
 	$VisualRoot/EditorPreview.visible = false
@@ -35,33 +35,53 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	var axes := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var desired_direction := world_direction_from_camera_basis(axes, camera_rig.get_flat_forward(), camera_rig.get_flat_right())
-	if desired_direction.length_squared() > 0.001:
-		last_world_direction = desired_direction
-		_set_sprite_direction(desired_direction)
-		_gait_phase += delta * 11.0
-		visual_root.position.y = sin(_gait_phase * TAU) * 0.012
-		visual_root.rotation.z = -axes.x * 0.035
-	else:
-		visual_root.position.y = move_toward(visual_root.position.y, 0.0, delta * 0.08)
-		visual_root.rotation.z = move_toward(visual_root.rotation.z, 0.0, delta * 0.18)
-		_set_sprite_direction(last_world_direction)
+	var has_move_input := desired_direction.length_squared() > 0.001
+	var target_velocity := desired_direction * move_speed if has_move_input else Vector3.ZERO
+	var horizontal_velocity := Vector3(velocity.x, 0.0, velocity.z)
+	var response := ground_acceleration if has_move_input else ground_deceleration
+	horizontal_velocity = horizontal_velocity.move_toward(target_velocity, response * delta)
+	velocity.x = horizontal_velocity.x
+	velocity.z = horizontal_velocity.z
 
-	var acceleration := ground_acceleration if desired_direction.length_squared() > 0.001 else ground_deceleration
-	velocity.x = move_toward(velocity.x, desired_direction.x * move_speed, acceleration * delta)
-	velocity.z = move_toward(velocity.z, desired_direction.z * move_speed, acceleration * delta)
 	if not is_on_floor():
 		velocity.y -= 18.0 * delta
 	elif velocity.y < 0.0:
 		velocity.y = -0.1
 	move_and_slide()
 
+	# Rotate toward the requested heading with damping instead of snapping the
+	# character's facing when the input crosses an animation view boundary.
+	if has_move_input:
+		var target_yaw := atan2(-desired_direction.x, -desired_direction.z)
+		rotation.y = lerp_angle(rotation.y, target_yaw, 1.0 - exp(-delta * turn_response))
+	last_world_direction = Vector3(-sin(rotation.y), 0.0, -cos(rotation.y))
+	_set_sprite_direction(last_world_direction)
+
+	# The source sequences are idle poses, not a walk cycle. Use only a restrained
+	# velocity-driven body bob and lean to soften starts and stops without faking one.
+	var speed_ratio := clampf(Vector2(velocity.x, velocity.z).length() / move_speed, 0.0, 1.0)
+	if speed_ratio > 0.04:
+		_gait_phase += delta * lerpf(7.0, 10.0, speed_ratio)
+	var target_bob := sin(_gait_phase) * 0.009 * speed_ratio
+	var target_lean := -axes.x * 0.022 * speed_ratio
+	var visual_response := 1.0 - exp(-delta * 8.0)
+	visual_root.position.y = lerpf(visual_root.position.y, target_bob, visual_response)
+	visual_root.rotation.z = lerpf(visual_root.rotation.z, target_lean, visual_response)
+
 func _set_sprite_direction(world_direction: Vector3) -> void:
 	var forward: Vector3 = camera_rig.get_flat_forward()
 	var right: Vector3 = camera_rig.get_flat_right()
 	var forward_amount := world_direction.dot(forward)
 	var right_amount := world_direction.dot(right)
+	# Hysteresis keeps the four source views from flickering when a diagonal
+	# crosses the forward/side boundary by only a few pixels of mouse motion.
+	if _forward_view_axis:
+		if absf(right_amount) > absf(forward_amount) + 0.16:
+			_forward_view_axis = false
+	elif absf(forward_amount) > absf(right_amount) + 0.16:
+		_forward_view_axis = true
 	var animation_name := "AWAY"
-	if absf(forward_amount) >= absf(right_amount):
+	if _forward_view_axis:
 		animation_name = "AWAY" if forward_amount >= 0.0 else "TOWARD"
 	else:
 		animation_name = "RIGHT" if right_amount >= 0.0 else "LEFT"

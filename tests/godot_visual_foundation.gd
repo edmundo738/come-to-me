@@ -27,6 +27,7 @@ func _run() -> void:
 	var camera := room.get_node_or_null("CameraRig/Camera3D") as Camera3D
 	_check(room.get_node_or_null("Environment/Floor/PixelStoneFloor") is MeshInstance3D, "the world is built from editable 3D mesh resources")
 	_check(room.get_node_or_null("Environment/Floor/CollisionShape3D") is CollisionShape3D, "the walkable floor has a real physics collider")
+	_check(room.get_node_or_null("Environment/Architecture/StoneBench_Right_Near/SeatCollision") is CollisionShape3D, "the simplified stone bench keeps a real physical blocker")
 	_check(room.get_tree().get_nodes_in_group("visual_occluders").size() >= 20, "the room contains distinct collision-backed depth and occlusion geometry")
 	_check(room.get_node_or_null("Environment/WorldEnvironment") is WorldEnvironment, "environment lighting/fog is a real WorldEnvironment")
 	_check(room.get_node_or_null("Environment/KeyLight") is DirectionalLight3D, "the primary light is a real shadow-casting 3D light")
@@ -52,11 +53,21 @@ func _run() -> void:
 
 	_check(player.is_on_floor(), "player settles onto the physical floor")
 	var start_position := player.global_position
+	var obstacle_test_position := start_position
+	obstacle_test_position.z = 7.3
+	player.global_position = obstacle_test_position
+	player.velocity = Vector3.ZERO
+	await physics_frame
 	Input.action_press("move_right")
-	for _frame in range(150):
+	await physics_frame
+	var first_step_speed := Vector2(player.velocity.x, player.velocity.z).length()
+	_check(first_step_speed > 0.0 and first_step_speed < player.move_speed, "movement accelerates into its target speed instead of snapping")
+	var first_step_turn := absf(player.rotation.y)
+	_check(first_step_turn > 0.0 and first_step_turn < PI * 0.5, "body turn eases toward the requested direction")
+	for _frame in range(149):
 		await physics_frame
 	Input.action_release("move_right")
-	_check(player.global_position.x > start_position.x + 4.0 and player.global_position.x < 7.15, "a real obstacle collider stops free movement at the expected side of the room (player x=%.2f)" % player.global_position.x)
+	_check(player.global_position.x > start_position.x + 4.0 and player.global_position.x < 7.15, "the aligned bench collider arrests lateral movement before the player crosses it (x=%.2f)" % player.global_position.x)
 	player.global_position = start_position
 	player.velocity = Vector3.ZERO
 	await physics_frame
@@ -78,12 +89,17 @@ func _run() -> void:
 		_check(not is_equal_approx(camera_rig.get_orbit_yaw(), yaw_before), "mouse motion changes third-person camera orbit")
 	else:
 		print("[UNKNOWN] native mouse capture/orbit requires a display-backed playtest")
+		camera_rig.orbit_yaw += 0.6
+	var smoothed_yaw_before := camera_rig._smoothed_yaw
+	await physics_frame
+	_check(not is_equal_approx(camera_rig._smoothed_yaw, smoothed_yaw_before) and not is_equal_approx(camera_rig._smoothed_yaw, camera_rig.orbit_yaw), "orbit turns toward its target with damping")
 	var zoom_before := camera_rig.orbit_distance
 	var wheel := InputEventMouseButton.new()
 	wheel.button_index = MOUSE_BUTTON_WHEEL_UP
 	wheel.pressed = true
 	camera_rig._unhandled_input(wheel)
 	_check(camera_rig.orbit_distance < zoom_before, "mouse wheel permits reversible camera-distance adjustment")
+	_check(camera_rig._current_distance > camera_rig.orbit_distance, "camera distance eases toward the zoom target instead of snapping")
 	_check(camera.global_position.distance_to(player.global_position) > 2.0, "camera remains behind the moving player at gameplay distance")
 	player.global_position = Vector3(9.5, 0.0, 0.0)
 	player.velocity = Vector3.ZERO

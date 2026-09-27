@@ -7,25 +7,25 @@
 top_radius = 0.4
 bottom_radius = 0.52
 height = 3.15
-radial_segments = 12
+radial_segments = 24
 
 [sub_resource type="CylinderMesh" id="BaseMesh"]
 top_radius = 0.64
 bottom_radius = 0.64
 height = 0.28
-radial_segments = 12
+radial_segments = 24
 
 [sub_resource type="CylinderMesh" id="CollarMesh"]
 top_radius = 0.55
 bottom_radius = 0.55
 height = 0.14
-radial_segments = 12
+radial_segments = 24
 
 [sub_resource type="CylinderMesh" id="CapMesh"]
 top_radius = 0.64
 bottom_radius = 0.48
 height = 0.3
-radial_segments = 12
+radial_segments = 24
 
 [sub_resource type="CylinderShape3D" id="ColumnCollision"]
 height = 3.84

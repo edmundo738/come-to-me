@@ -1,27 +1,28 @@
 # Current workspace state — 2026-09-27
 
 ## FACT
-- Checkpoint 01 is now `experiments/visual_foundation/foundation_room.tscn`; `project.godot` selects it as the F5 main scene. `scenes/main.tscn` and `experiments/manual_3d_room/` remain preserved, not deleted or overwritten.
-- The new scene is deliberately visual-only: editable 3D floor/architecture/props/collisions, WorldEnvironment, lights/shadows, a free 3D player controller and mouse-orbit Camera3D. It contains no enemies, stealth, combat, audio, HUD, turns/cells, or procedural content.
-- The character implementation is a reversible visual hypothesis: existing separate PNG idle frames in an `AnimatedSprite3D`, a real CharacterBody3D capsule, lighting, alpha-cut shadow and contact shadow. The left/right frames remain review candidates; no rejected walk is used.
-- `project.godot` selects Forward+ and explicitly requests `d3d12` on Windows with Godot 4.7 project features. This configuration has not been tested on Windows hardware.
+- Project main scene is `experiments/visual_foundation/foundation_room.tscn`; the prior main scene and earlier experiments remain preserved.
+- Scope remains visual-only: 3D architecture, floor, light/shadow, a free CharacterBody3D and third-person camera. No combat, creatures, stealth, audio, HUD, progression, or proceduralization was added.
+- The visual technique remains reversible: existing pixel-art idle views on a Y-facing AnimatedSprite3D, real capsule collision and alpha/contact shadow. Side views remain review candidates; the rejected walk sequence is unused.
 
-## MEASURED / OBSERVED
-- The local source tree matched every path and byte in remote branch `arena/01a0dda9-come-to-me` at `7f6ba41`; zero local-only files were found. A non-destructive mixed ref alignment brought local HEAD to that remote tip before implementation.
-- No Godot executable, X server, Wayland compositor, Xvfb, or graphical display backend is available in this workspace. A filesystem search found no Godot binary. Debian package-index refresh and downloads from GitHub Release assets failed because the sandbox connection ended/failed during TLS/EOF.
-- The earlier run `36315052254` built the pinned engine then failed during its headless smoke step; retrieving logs failed with TLS/EOF. The failing subtest/cause remain UNKNOWN.
-- Static validation here: `bash -n tests/godot_headless_smoke.sh` passed; all 8 Python tests passed; 15 new `.tscn`/`.tres` files have existing resource paths and consistent `load_steps`; all three generated 64×64 PNGs passed CRC/decompression checks; `git diff --check` passed.
-- GitHub Actions built Godot 4.7.2 and completed project import plus the new visual-foundation headless test, but run `36325301170` failed 2 assertions: the obstacle-stop position bound and the Windows D3D12 preference assertion. The runner annotations did not include the position value. The Windows-specific setting lookup returned a non-matching value on the Linux runner; the cause is unconfirmed. The check now verifies the explicit Windows entry in `project.godot` only, not actual D3D12 driver selection. The collision test now allows a wider still-blocked-side bound and reports the measured X value if it fails again. These are test corrections, not a visual approval.
-- The Actions run `36325301170` failed at the visual-foundation smoke step; following legacy smoke suites were therefore not reached. `tests/godot_visual_foundation.gd` has been added to the workflow path filter so its next edit triggers verification.
-- This workspace still has no Godot executable. No display-backed game launch, native mouse/playtest, or visual review has occurred. Both visual acceptance questions remain UNKNOWN.
+## OWNER PLAYTEST — FIRST ITERATION
+- **FACT — executed by the owner:** the first visual foundation was run in-game.
+- **OBSERVED — owner's report:** free camera-relative movement works as a proof; the character perspective is promising; the spatial composition suggests an interesting temple-like place. Preserve this foundation.
+- **OBSERVED — owner's report:** assets and scale remain awkward/geometric, visual language and identity are underdeveloped, movement/camera feel stiff, and camera transitions must not reveal abrupt system limits. Desired direction: supernatural + technology + mystery, communicated through composition, materials, light, depth and architecture rather than particle overload.
+- Full report and second-iteration scope: `docs/game_direction.md`.
 
-## UNKNOWN
-- Whether the new project imports/parses and the 3D scene runs in Godot; actual CharacterBody collision, mouse capture/orbit, camera collision compression, Forward+ rendering, Direct3D 12 preference, shadows, and pixel texture import.
-- Whether the character reads as a spatial 2D/2.5D figure rather than a card/sprite pasted into the world; whether movement glides; whether the framing, scale, depth and lighting belong together; and whether the experience is comfortable/beautiful.
-- The visual checkpoint is **not approved** until a display-backed run is observed. A headless pass can validate resources/math/physics scripts only, not the visual acceptance criterion.
+## ITERATION 02 — IN PROGRESS, NOT PLAYTESTED
+- The controller now uses vector acceleration/braking and a damped body turn. The camera smooths orbit target, pitch, follow pivot, position and obstacle distance separately. View selection has a small hysteresis band.
+- The composition retains the temple-like layout while matching the portal supports to rounder columns, simplifying repeated clutter into one stone bench, and softening the stone/bronze palette. A single low-energy teal seam is the reversible identity cue.
+- These changes are not visually validated. The owner must run the focused update package and report whether they help or harm.
+
+## TEST / VALIDATION STATUS
+- Remote run `36328344782` built Godot 4.7.2 and loaded/executed the visual-foundation test; the old bench-collision setup failed at X=7.63. Iteration 02 aligns that test to the bench center and revises the bench mesh/collider; this fix needs a rerun.
+- This workspace has no desktop Godot executable/display. A headless result cannot judge camera comfort, art quality or world/character integration.
+- Iteration 02 static checks: 8 Python tests passed; `bash -n`, `git diff --check`, resource paths/`load_steps` for 15 scene/material files, and PNG CRC/decompression passed. The visual-foundation headless workflow still needs to rerun after the new collision setup and camera/controller changes. No visual success is claimed. Final 2.5D technique, coherence, scale and atmosphere remain UNKNOWN.
 
 ## NEXT
-Run `experiments/visual_foundation/foundation_room.tscn` in a display-enabled Godot 4.7.2 environment, move W/S/A/D and diagonals, orbit and zoom the camera, test a pillar occlusion and wall collision, then record objective visual failures before calling the checkpoint done. Do not add any future gameplay systems to this pass.
+Run static validation, trigger the pinned Godot headless workflow, and provide the owner a ZIP with only `project.godot`, the visual-foundation scene/resources and directly referenced character frames. The owner will use Godot 4.7.2, press F5, repeat camera/movement/collision tests, and report visual results before another adjustment.
 
 ---
 

@@ -6,4 +6,4 @@
 albedo_texture = ExtResource("1_tiles")
 roughness = 0.94
 texture_filter = 0
-uv1_scale = Vector3(18, 1, 28)
+uv1_scale = Vector3(9, 1, 14)

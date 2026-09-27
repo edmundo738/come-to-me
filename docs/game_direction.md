@@ -1,6 +1,6 @@
-# Come to Me — direção atual e Checkpoint 01
+# Come to Me — direção atual e Checkpoint 01, Iteração 02
 
-**Fonte:** direção confirmada pelo proprietário em 2026-09-27. Esta nota separa intenção de design da evidência técnica/visual; não é um GDD completo.
+**Fonte:** direção e playtest relatados pelo proprietário em 2026-09-27. Esta nota separa intenção de design da evidência técnica/visual; não é um GDD completo.
 
 ## Visão
 
@@ -18,13 +18,35 @@ As áreas devem poder variar — corredores, labirintos, salas conectadas, camin
 
 Objetivo único: responder visualmente **“o personagem parece existir neste mundo 3D e a câmara, movimento e cenário parecem pertencer ao mesmo jogo?”**
 
-O teste atual está em `experiments/visual_foundation/foundation_room.tscn`, agora cena principal do projeto. É um ambiente pequeno, manual e editável com piso/colisão, paredes, arcos, pilares, obstáculos, luzes, sombras, profundidade e um personagem físico. O ambiente é geometria e recursos Godot, não desenho integral em `draw_*()`.
+O teste atual está em `experiments/visual_foundation/foundation_room.tscn`, agora cena principal do projeto. É um ambiente manual e editável com piso/colisão, paredes, molduras de passagem, pilares, um banco de pedra, luzes, sombras, profundidade e um personagem físico. O ambiente é geometria e recursos Godot, não desenho integral em `draw_*()`.
 
 **Limites ativos:** sem combate, inimigos, estátuas, demónios, Espelhos, Sombras, Reflexos, stealth/Shift, arremessáveis, áudio, respiração/batimento, HUD, progressão, proceduralização, mundo aberto ou turnos/células.
 
-**Implementado como hipótese reversível:** o personagem usa `AnimatedSprite3D` com os PNGs individuais existentes, orientação vertical Y-facing, luz 3D e sombra alfa; movimento livre `CharacterBody3D` com aceleração e um pequeno bob temporário. Os sprites laterais permanecem candidatos de revisão; a caminhada rejeitada não é usada. Isto não aprova essa técnica nem prova que o personagem está integrado; se parecer uma figura colada ou deslizar, substituir/corrigir a hipótese.
+**Implementado como hipótese reversível:** o personagem usa `AnimatedSprite3D` com os PNGs individuais existentes, orientação vertical Y-facing, luz 3D e sombra alfa; movimento livre `CharacterBody3D` com aceleração, travagem e viragem suavizadas. A seleção entre frente/lateral tem histerese pequena para não oscilar em diagonais; os sprites laterais permanecem candidatos de revisão, e a caminhada rejeitada não é usada. Isto não aprova a técnica nem prova integração espacial. O leve assentamento corporal é derivado da velocidade e não se apresenta como walk cycle.
 
-A câmara atual orbita por rato, permite ajustar distância pelo scroll, acompanha com suavização e comprime o percurso perante geometria por raycast. Isso testa a base, não implementa toda a linguagem cinematográfica futura: não há zoom de combate, cutscenes, alterações de FOV ou comportamento contextual amplo.
+A câmara orbita por rato e permite ajustar distância pelo scroll. Nesta iteração, alvo, yaw/pitch, posição e resposta à obstrução usam damping separado. O raycast continua simples e pode revelar clipping ou limites em certos ângulos; a prova do proprietário decidirá o próximo ajuste. Não há zoom de combate, cutscenes, alterações de FOV ou comportamento contextual amplo.
+
+## Relato do primeiro playtest do proprietário — 2026-09-27
+
+**FACT — executado:** o proprietário abriu e testou a Fundação Visual num build jogável.
+
+**OBSERVED — relato do proprietário:**
+- Movimento livre 3D relativo à câmara funcionou como prova inicial.
+- A representação/perspectiva do personagem é promissora para este teste; a técnica 2.5D final continua **UNKNOWN**.
+- Mesmo com assets geométricos provisórios, a composição sugeriu um lugar arquitetónico interessante, quase um templo. **Preservar esta fundação; não a descartar.**
+- Os assets/proporções ainda são feios, artificiais, geométricos e desproporcionais; ainda não existe linguagem visual coerente nem identidade suficiente de sobrenatural + tecnologia + mistério.
+- O movimento é demasiado mecânico/travado; órbita e câmara ainda carecem de damping e de uma resposta de RPG de ação/terror mais refinada.
+- Transições de distância/perspectiva devem ser suaves e não expor um limite abrupto do sistema. A prioridade é manter leitura da personagem sem retirar o controlo do rato.
+
+## CHECKPOINT 01 — Iteração 02: camera/character feel
+
+Pequena implementação → build → playtest do proprietário → observação. Escopo exclusivo: **Camera Feel, Character Feel, integração 2.5D, profundidade/iluminação, proporção/escala e uma primeira pista visual sobrenatural-tecnológica.** O cenário deve começar a ler como lugar específico, não como coleção de primitivas.
+
+A iteração refinou a resposta de velocidade em vetor (INPUT → direção desejada → velocidade alvo → aceleração/travagem → movimento), rotação corporal amortecida, seleção de vistas com histerese, damping separado de órbita/seguimento/posição/distância e a forma dos módulos já existentes. O antigo bloco foi redesenhado como banco físico; três cópias redundantes foram removidas; suportes redondos repetidos dão linguagem comum a colunas e passagens; pedra/bronze menos saturados e uma linha teal de baixa energia sugerem, sem partículas, um vestígio tecnológico/sobrenatural. São **hipóteses reversíveis**, não aprovação visual.
+
+**Não adicionar nesta iteração:** combate, criaturas, stealth, arremessáveis, áudio, HUD, progressão ou proceduralização. Não escolher uma técnica 2.5D definitiva nem multiplicar assets para esconder uma linguagem visual fraca.
+
+**Playtest pendente:** o proprietário deve observar controlo e easing da câmara, limites/oclusão, arranque/paragem/viragens, mudança de vistas, escala, banco/colisões, materiais, contraste e se a pista de identidade lê sem efeitos em excesso. Iteração 02 não foi executada/observada pelo agente; não declarar sucesso por testes estáticos/headless.
 
 ## Direção futura registada — fora do checkpoint atual
 
@@ -48,11 +70,11 @@ O projeto usa Godot **4.7** como mínimo declarado e seleciona o renderer **Forw
 
 ## Evidência e validação
 
-- **FACT — ficheiros:** a cena nova, `CharacterBody3D`, câmera orbitável, meshes, materiais, colisões, sombras, texturas pixel-blockout e teste headless foram adicionados. `project.godot` aponta F5 para a fundação visual.
-- **FACT — preservação:** `scenes/main.tscn`, `experiments/manual_3d_room/`, Evasion First, procedural e arte/review antigos continuam no repositório; a sala manual anterior é evidência técnica, não referência visual final.
-- **OBSERVED — relato do proprietário:** o slice procedural não foi divertido/suspenseful/coerente; o relato permanece em `experiments/procedural_first_level/README.md`. O procedural é evidência, não a base de expansão deste checkpoint.
-- **MEASURED — validação local deste checkpoint:** nenhuma execução Godot foi possível neste workspace; não há binário Godot nem display/GUI disponível. Shell/XML/verificações estáticas não demonstram funcionamento visual.
-- **UNKNOWN:** importação/parsing e execução da cena nova; resposta física real, mouse, colisão da câmara, iluminação, sombras, aparência à distância normal, leitura e desempenho. Também é UNKNOWN se a personagem parece integrada ou se o movimento parece deslizar.
-- A Actions run `36315052254` da versão anterior concluiu com falha no smoke headless após compilar Godot; o download do log falhou com TLS/EOF. A causa/sub-suite exata continuam UNKNOWN. Uma nova execução é necessária, e um smoke headless não substitui playtest visual com display.
+- **FACT — ficheiros:** `project.godot` usa `foundation_room.tscn` como cena F5; há `CharacterBody3D`, `Camera3D`, geometria/colisões/luzes e teste de recursos/movimento/câmara. Experiências anteriores e artes de review permanecem preservadas.
+- **FACT — teste executado pelo proprietário:** a Iteração 01 foi aberta e jogada; os relatos qualitativos estão documentados acima. O agente não viu o ecrã nem deve ampliar o relato para além do que foi observado pelo proprietário.
+- **MEASURED — headless:** CI compilou Godot 4.7.2 e importou/executou a cena. A run `36328344782` falhou uma asserção de colisão do banco no ponto de teste original (X observado 7.63). Foi alinhado o teste ao centro do banco e o módulo foi remodelado; a correção ainda precisa de rerun. A execução remota não valida o feedback visual.
+- **MEASURED — local:** 8 testes Python passaram; `bash -n`, `git diff --check`, caminhos e `load_steps` das 15 cenas/materiais e CRC/descompressão de três PNGs passaram. O workspace do agente não tem binário/display Godot, pelo que não houve segundo playtest local.
+- **UNKNOWN:** se a Iteração 02 compila/importa sem erro, se a mudança de aceleração e câmara melhora a sensação ao proprietário, se as transições parecem menos limitadas, e se escala, materiais e pista teal criam coerência sobrenatural-tecnológica em vez de primitivismo.
+- Nenhum sucesso visual é inferido do build/headless. O próximo juízo depende do playtest do proprietário com a pasta/arquivo de atualização focado.
 
 **Critério de conclusão:** executar e jogar a cena num display, orbitar a câmara, aproximar/afastar, atravessar diagonais e recuar, testar oclusão e colisões, observar sombras e iluminação a distância normal. Se a integração não convencer, registar precisamente o que falhou e fazer uma correção pequena. Não chamar o checkpoint de aprovado apenas porque compila.
