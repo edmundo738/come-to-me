@@ -11,7 +11,8 @@
 - No Godot executable, X server, Wayland compositor, Xvfb, or graphical display backend is available in this workspace. A filesystem search found no Godot binary. Debian package-index refresh and downloads from GitHub Release assets failed because the sandbox connection ended/failed during TLS/EOF.
 - The earlier run `36315052254` built the pinned engine then failed during its headless smoke step; retrieving logs failed with TLS/EOF. The failing subtest/cause remain UNKNOWN.
 - Static validation here: `bash -n tests/godot_headless_smoke.sh` passed; all 8 Python tests passed; 15 new `.tscn`/`.tres` files have existing resource paths and consistent `load_steps`; all three generated 64×64 PNGs passed CRC/decompression checks; `git diff --check` passed.
-- The new GDScript test has not been executed because no Godot executable is present. No GDScript parse, Godot import, physics runtime, mouse test, GUI/gameplay observation, or visual review has occurred in this turn.
+- GitHub Actions built the pinned Godot 4.7.2 headless editor successfully on commits `5a0fd59` and `9a6a7d6`, but the smoke-test step failed both times. The signed Actions log download returned `EOF`, so the failing subtest and Godot diagnostic are **unknown**; do not treat this as a pass or infer the cause. Added failure annotations to the runner; diagnostic rerun `36325301170` is in progress as of this update.
+- This workspace still has no Godot executable. No display-backed game launch, native mouse/playtest, or visual review has occurred. Both visual acceptance questions remain UNKNOWN.
 
 ## UNKNOWN
 - Whether the new project imports/parses and the 3D scene runs in Godot; actual CharacterBody collision, mouse capture/orbit, camera collision compression, Forward+ rendering, Direct3D 12 preference, shadows, and pixel texture import.
