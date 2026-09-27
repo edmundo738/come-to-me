@@ -1,0 +1,54 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://experiments/manual_3d_room/grid_cell_marker_3d.gd" id="1_grid_cell"]
+[ext_resource type="Material" path="res://experiments/manual_3d_room/materials/portal_teal.tres" id="2_portal"]
+
+[sub_resource type="BoxMesh" id="GatePostMesh"]
+size = Vector3(0.14, 2.45, 0.22)
+
+[sub_resource type="BoxMesh" id="GateLintelMesh"]
+size = Vector3(1.0, 0.18, 0.22)
+
+[sub_resource type="QuadMesh" id="GateVeilMesh"]
+size = Vector2(0.68, 1.88)
+
+[sub_resource type="BoxShape3D" id="GateSensorShape"]
+size = Vector3(0.72, 1.8, 0.72)
+
+[node name="ExitGate" type="Area3D" groups=["room_objectives"]]
+position = Vector3(9, 0, 8)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_grid_cell")
+grid_cell = Vector2i(9, 8)
+
+[node name="GoalSensor" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.9, 0)
+shape = SubResource("GateSensorShape")
+
+[node name="LeftPost" type="MeshInstance3D" parent="."]
+position = Vector3(-0.43, 1.225, 0)
+mesh = SubResource("GatePostMesh")
+material_override = ExtResource("2_portal")
+
+[node name="RightPost" type="MeshInstance3D" parent="."]
+position = Vector3(0.43, 1.225, 0)
+mesh = SubResource("GatePostMesh")
+material_override = ExtResource("2_portal")
+
+[node name="Lintel" type="MeshInstance3D" parent="."]
+position = Vector3(0, 2.44, 0)
+mesh = SubResource("GateLintelMesh")
+material_override = ExtResource("2_portal")
+
+[node name="Threshold" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.95, 0.12)
+mesh = SubResource("GateVeilMesh")
+material_override = ExtResource("2_portal")
+
+[node name="ArrivalLight" type="OmniLight3D" parent="."]
+position = Vector3(0, 1.25, 0.45)
+light_color = Color(0.12, 0.92, 0.76, 1)
+light_energy = 1.4
+omni_range = 4.0
+shadow_enabled = false

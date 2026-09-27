@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://experiments/manual_3d_room/grid_cell_marker_3d.gd" id="1_grid_cell"]
+[ext_resource type="Material" path="res://experiments/manual_3d_room/materials/wall_stone.tres" id="2_wall_material"]
+
+[sub_resource type="BoxMesh" id="WallCellMesh"]
+size = Vector3(1, 2.6, 1)
+
+[sub_resource type="BoxShape3D" id="WallCellShape"]
+size = Vector3(1, 2.6, 1)
+
+[node name="WallCell" type="StaticBody3D" groups=["grid_blockers"]]
+script = ExtResource("1_grid_cell")
+
+[node name="StoneBlock" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.3, 0)
+mesh = SubResource("WallCellMesh")
+material_override = ExtResource("2_wall_material")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.3, 0)
+shape = SubResource("WallCellShape")

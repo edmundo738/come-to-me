@@ -1,8 +1,8 @@
 # Environment concept review — not production assets
 
-The owner wants all three environment themes to be possible phases, but one consistent camera so gameplay stays legible. The first batch was too much of a corner/oblique view; the second became too flat and directly overhead. Both are preserved in review folders, not used as production references.
+The owner accepted this intermediate 2.5D concept perspective as a historical environmental reference after rejecting a corner-heavy batch and a flat overhead batch. The later direction is to test a true 3D room with 2D characters and an editable Camera3D. This image set informs readability only; it does not decide that new camera or override the current manual-room hypothesis.
 
-## Current review set: mixed 2.5D camera
+## Historical review set: mixed 2.5D camera
 
 - `three_environment_directions_mixed_2_5d.png` — comparison sheet.
 - `environment_a_chess_cathedral_moderate.png` — manor / chess.
@@ -14,4 +14,4 @@ This pass aims for the midpoint: a fixed high camera with visible but modest wal
 - `review_rejected_corner_view/` preserves the first, too-oblique set.
 - `review_rejected_overhead_flat/` preserves the second, too-overhead set.
 
-These are concept illustrations only. The camera perspective is approved as a development reference; the illustrations themselves are not production textures or decals, and their specific visual details remain unapproved.
+These are concept illustrations only. The old intermediate 2.5D perspective was approved as a reference at the time; none of these images is production art. The new room's real camera angle must be reviewed separately.

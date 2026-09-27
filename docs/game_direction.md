@@ -1,42 +1,34 @@
-# Direção do jogo — primeiro vertical slice
+# Come to Me — direção de trabalho atual
 
-**Estado:** direção aprovada pelo proprietário para orientar a próxima fase de planificação. Não é um GDD completo nem congela decisões futuras.
+**Fonte:** decisão do proprietário, 2026-09-27. Esta nota guarda decisões ativas e o próximo teste; não é um GDD completo.
 
-## Hierarquia da experiência
+## Identidade
 
-1. **Evasão tática / horror — eixo principal.** O jogador percebe a ameaça, aprende o comportamento do perseguidor e, sob pressão, decide rotas, quando fugir, esperar, despistar ou arriscar. O espaço deve oferecer decisões e oportunidades de evasão; correr em linha reta não basta.
-2. **Survival horror — camada de suporte.** Vulnerabilidade, recursos/condições limitadas, consequências, perigo e incerteza devem dar peso às escolhas. Não adicionar sistemas tradicionais por hábito: cada um precisa reforçar a tensão e as decisões de evasão/exploração.
-3. **Exploração narrativa / atmosférica — presente, mas subordinada neste slice.** Lugares, descoberta, contexto, narrativa ambiental e momentos de menor pressão devem despertar curiosidade sem tirar o protagonismo do loop de evasão e sobrevivência.
+**Jogo de estratégia com evasão, suspense, sobrevivência e exploração atmosférica.** O foco é leitura do espaço, decisões simples mas significativas, movimento compreensível, reação do inimigo, objetivo claro, improvisação e progresso durante uma situação. Não reduzir a experiência a fugir em linha reta de um monstro.
 
-Essa ordem é uma prioridade relativa, não uma percentagem nem três modos separados. O slice deve misturar os três, com evasão tática claramente à frente.
+A versão antiga associada ao Claudio foi relatada como mais divertida. O que nela funcionava ainda é **UNKNOWN**; não copiar sua implementação sem descobrir a razão através de comparação e teste.
 
-## Base existente — FACTS DO CÓDIGO
+## Base de comportamento aceita
 
-- Projeto Godot com grelha screen-aligned de `11 × 9`; a sala atual é fixa e desenhada em código.
-- O jogador pode mover-se uma célula, saltar duas células na última direção escolhida, ou esperar. Um movimento bloqueado não consome turno.
-- O perseguidor tenta reduzir a distância Manhattan e desempata na ordem direita, baixo, esquerda, cima; isto não é pathfinding e, no mapa atual, a simulação confirma que ele pode parar numa parede apesar de existir rota. A intenção seguinte não é mostrada como marcador. A investigação e o próximo experimento estão em `docs/gameplay_core_research.md`.
-- Mover-se pode atrair o perseguidor para a célula que o jogador acabou de deixar; isso já oferece uma forma básica de despiste, não um sistema geral de distração.
-- Há dois escudos fixos, colisões têm consequências, existem fragmentos opcionais e uma saída/portal.
-- As paredes bloqueiam movimento. Não há ainda mecânica implementada de esconder-se/cobertura, distração por objetos/ruído, inventário de sobrevivência, níveis ou narrativa ambiental interativa.
+**Evasion First é base de comportamento, não experimento a esquecer.** Preservar a lógica existente:
 
-Estes pontos descrevem o código do protótipo; não provam que o loop seja divertido, suficientemente tenso ou legível para novos jogadores.
+**ver → perseguir → perder visão → investigar → procurar → recuperar**
 
-## Experiência implementada; teste humano pendente
+O código-fonte continua em `experiments/evasion_first_slice/evasion_enemy_state.gd`; a nova sala chama essa mesma classe, sem a reescrever. Não criar tipos adicionais de inimigo antes de um funcionar bem. As decisões estratégicas que o espaço oferece importam tanto quanto a inteligência do inimigo.
 
-A pesquisa em `docs/gameplay_core_research.md` encontrou um bloqueador antes de avaliar diversão: a perseguição atual pode parar numa parede. Para manter a experiência aditiva, o BFS e o ciclo **linha de visão → perseguição → perda de visão → investigação da última posição → procura breve → alívio** estão isolados em `experiments/evasion_first_slice/`; `scenes/main.tscn` e o `EnemyState` original permanecem como baseline.
+## Próximo protótipo: uma sala manual e editável
 
-A variante reutiliza ações existentes (mover, esperar, saltar), paredes, dois escudos e o fragmento. Não adiciona esconderijo, distrações, inventário ou Diretor dinâmico. Alcance, duração da procura e pista dos olhos são parâmetros provisórios. O smoke Godot headless passou, incluindo os 7.482 pares de pathfinding, transições e integração da cena; não confirma diversão nem legibilidade. O próximo passo é execução visual e playtest sem explicar a solução ao participante. Critérios estão em `docs/gameplay_core_research.md`.
+Abrir `experiments/manual_3d_room/manual_3d_room.tscn` no Godot e executar a cena atual com **F6**. A árvore contém `Environment` (Floor, Walls, Props, Decals, Doors), `Gameplay` (Player, Enemy) e `CameraRig`. Piso, segmentos de parede, pilares, colisões, materiais, porta e câmera são Nodes/Scenes/Meshes editáveis; os bloqueadores de grelha são calculados a partir das mesmas instâncias visíveis que têm colisão.
 
-## UNKNOWN / ainda não decidido
+O mundo 3D + personagens 2D, o ângulo da câmera, a escala, o decal e a silhueta da estátua são **HIPÓTESES** para revisão, não direção de arte aprovada. A câmera mantém esquerda/direita alinhados ao eixo X e cima/baixo ao eixo Z; a leitura real tem de ser observada.
 
-- Se esconder, despistar por interação ambiental ou outro verbo será a primeira nova capacidade de evasão.
-- Como e quando introduzir narrativa ambiental e os temas do protagonista no primeiro slice.
-- Duração-alvo da sala, progressão entre salas e estrutura do jogo completo.
-- Se a configuração atual de escudos permanece ou evolui após teste humano.
-- Diversão, tensão e legibilidade do loop para pessoas que não conhecem o protótipo. A validação headless não responde a essas questões.
+O jogador é um `CharacterBody3D` e percorre o espaço continuamente. Só cruzar para outra célula consome uma unidade estratégica e move o inimigo uma vez; andar dentro da célula não avança o turno. `E` espera uma unidade. WASD/setas movimentam; `R` reinicia. A animação usa os frames de idle existentes e um pequeno movimento corporal; **não** usa a caminhada rejeitada. Ainda é UNKNOWN se esse movimento parece caminhar ou deslizar.
 
-## Limites e continuidade
+## Evidência, limites e próximo passo
 
-- Não promover animações em revisão nem tocar no material rejeitado; a aprovação visual continua separada da validação técnica (`docs/character-animation/README.md`).
-- Esta direção orienta o primeiro slice. Rever decisões à luz de playtest, sem expandir o CRES nem transformar esta nota num processo burocrático.
-- Depois de um teste humano, registar somente o que foi observado, o que falhou e a próxima alteração concreta.
+- **OBSERVED — relato de playtest do proprietário sobre o procedural:** tecnicamente corria, mas não era divertido, assustador ou visualmente coerente; parecia PNGs numa arena, com profundidade/perspectivas incompatíveis, deslocamento como teletransporte e pouca sensação de espaço real. O relato integral está em `experiments/procedural_first_level/README.md`.
+- O procedural e o seu kit ficam preservados como evidência. Não o estender nem o usar para disfarçar dúvidas de design; primeiro validar esta situação manual.
+- **OBSERVED — validação técnica anterior:** Actions run `36311764605` compilou o Godot, mas falhou na etapa do smoke headless; o download do log falhou com TLS/EOF. A sub-suite e a causa são **UNKNOWN**. Não declarar que o teste procedural passou.
+- **Ainda não testado:** parsing/importação e execução da nova sala; colisões 3D; movimento no limite da célula; transições Evasion First no cenário; coerência visual, diversão ou suspense. O ambiente atual não tem Godot GUI/binário local.
+
+Próxima observação: no editor, verificar primeiro a câmera e escala; depois mover sem explicar, cruzar uma célula, perder a linha de visão atrás de um pilar e esperar. Corrigir apenas o que essa sala demonstrar. Sem mais sistemas, conteúdo procedural ou HUD nesta fase.

@@ -1,0 +1,269 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://experiments/manual_3d_room/manual_room_controller.gd" id="1_controller"]
+[ext_resource type="Environment" path="res://experiments/manual_3d_room/materials/room_environment.tres" id="2_environment"]
+[ext_resource type="Material" path="res://experiments/manual_3d_room/materials/floor_stone.tres" id="3_floor_material"]
+[ext_resource type="PackedScene" path="res://experiments/manual_3d_room/wall_cell.tscn" id="4_wall_cell"]
+[ext_resource type="PackedScene" path="res://experiments/manual_3d_room/pillar_cell.tscn" id="5_pillar_cell"]
+[ext_resource type="Material" path="res://experiments/manual_3d_room/materials/resin_decal.tres" id="6_resin"]
+[ext_resource type="PackedScene" path="res://experiments/manual_3d_room/exit_gate.tscn" id="7_exit"]
+[ext_resource type="PackedScene" path="res://experiments/manual_3d_room/player_character.tscn" id="8_player"]
+[ext_resource type="PackedScene" path="res://experiments/manual_3d_room/enemy_statue.tscn" id="9_enemy"]
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+size = Vector3(11, 0.2, 9)
+
+[sub_resource type="BoxShape3D" id="FloorCollision"]
+size = Vector3(11, 0.2, 9)
+
+[sub_resource type="PlaneMesh" id="ResinPuddleMesh"]
+size = Vector2(0.86, 0.58)
+
+[node name="ComeToMeWorld" type="Node3D"]
+script = ExtResource("1_controller")
+
+[node name="Environment" type="Node3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Environment"]
+environment = ExtResource("2_environment")
+
+[node name="KeyLight" type="DirectionalLight3D" parent="Environment"]
+rotation_degrees = Vector3(-48, -28, 0)
+light_color = Color(0.83, 0.87, 0.79, 1)
+light_energy = 1.15
+shadow_enabled = true
+directional_shadow_max_distance = 25.0
+
+[node name="FillLight" type="OmniLight3D" parent="Environment"]
+position = Vector3(3.0, 3.0, 2.0)
+light_color = Color(0.38, 0.53, 0.48, 1)
+light_energy = 0.6
+omni_range = 7.0
+shadow_enabled = false
+
+[node name="Floor" type="StaticBody3D" parent="Environment"]
+position = Vector3(5, -0.1, 4)
+collision_layer = 1
+
+[node name="StoneSlab" type="MeshInstance3D" parent="Environment/Floor"]
+mesh = SubResource("FloorMesh")
+material_override = ExtResource("3_floor_material")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Floor"]
+shape = SubResource("FloorCollision")
+
+[node name="Walls" type="Node3D" parent="Environment"]
+
+[node name="Props" type="Node3D" parent="Environment"]
+
+[node name="Decals" type="Node3D" parent="Environment"]
+
+[node name="ResinPuddle_Blockout" type="MeshInstance3D" parent="Environment/Decals"]
+position = Vector3(5, 0.008, 2)
+rotation_degrees = Vector3(-90, 0, 0)
+mesh = SubResource("ResinPuddleMesh")
+material_override = ExtResource("6_resin")
+
+[node name="Doors" type="Node3D" parent="Environment"]
+
+[node name="Boundary_00_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 0)
+grid_cell = Vector2i(0, 0)
+
+[node name="Boundary_01_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(1, 0, 0)
+grid_cell = Vector2i(1, 0)
+
+[node name="Boundary_02_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(2, 0, 0)
+grid_cell = Vector2i(2, 0)
+
+[node name="Boundary_03_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(3, 0, 0)
+grid_cell = Vector2i(3, 0)
+
+[node name="Boundary_04_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(4, 0, 0)
+grid_cell = Vector2i(4, 0)
+
+[node name="Boundary_05_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(5, 0, 0)
+grid_cell = Vector2i(5, 0)
+
+[node name="Boundary_06_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(6, 0, 0)
+grid_cell = Vector2i(6, 0)
+
+[node name="Boundary_07_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(7, 0, 0)
+grid_cell = Vector2i(7, 0)
+
+[node name="Boundary_08_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(8, 0, 0)
+grid_cell = Vector2i(8, 0)
+
+[node name="Boundary_09_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(9, 0, 0)
+grid_cell = Vector2i(9, 0)
+
+[node name="Boundary_10_00" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 0)
+grid_cell = Vector2i(10, 0)
+
+[node name="Boundary_00_01" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 1)
+grid_cell = Vector2i(0, 1)
+
+[node name="Boundary_10_01" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 1)
+grid_cell = Vector2i(10, 1)
+
+[node name="Boundary_00_02" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 2)
+grid_cell = Vector2i(0, 2)
+
+[node name="Boundary_10_02" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 2)
+grid_cell = Vector2i(10, 2)
+
+[node name="Boundary_00_03" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 3)
+grid_cell = Vector2i(0, 3)
+
+[node name="Boundary_10_03" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 3)
+grid_cell = Vector2i(10, 3)
+
+[node name="Boundary_00_04" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 4)
+grid_cell = Vector2i(0, 4)
+
+[node name="Boundary_10_04" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 4)
+grid_cell = Vector2i(10, 4)
+
+[node name="Boundary_00_05" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 5)
+grid_cell = Vector2i(0, 5)
+
+[node name="Boundary_10_05" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 5)
+grid_cell = Vector2i(10, 5)
+
+[node name="Boundary_00_06" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 6)
+grid_cell = Vector2i(0, 6)
+
+[node name="Boundary_10_06" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 6)
+grid_cell = Vector2i(10, 6)
+
+[node name="Boundary_00_07" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 7)
+grid_cell = Vector2i(0, 7)
+
+[node name="Boundary_10_07" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 7)
+grid_cell = Vector2i(10, 7)
+
+[node name="Boundary_00_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(0, 0, 8)
+grid_cell = Vector2i(0, 8)
+
+[node name="Boundary_01_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(1, 0, 8)
+grid_cell = Vector2i(1, 8)
+
+[node name="Boundary_02_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(2, 0, 8)
+grid_cell = Vector2i(2, 8)
+
+[node name="Boundary_03_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(3, 0, 8)
+grid_cell = Vector2i(3, 8)
+
+[node name="Boundary_04_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(4, 0, 8)
+grid_cell = Vector2i(4, 8)
+
+[node name="Boundary_05_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(5, 0, 8)
+grid_cell = Vector2i(5, 8)
+
+[node name="Boundary_06_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(6, 0, 8)
+grid_cell = Vector2i(6, 8)
+
+[node name="Boundary_07_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(7, 0, 8)
+grid_cell = Vector2i(7, 8)
+
+[node name="Boundary_08_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(8, 0, 8)
+grid_cell = Vector2i(8, 8)
+
+[node name="Boundary_10_08" parent="Environment/Walls" instance=ExtResource("4_wall_cell")]
+position = Vector3(10, 0, 8)
+grid_cell = Vector2i(10, 8)
+
+[node name="Pillar_04_02" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(4, 0, 2)
+grid_cell = Vector2i(4, 2)
+
+[node name="Pillar_04_03" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(4, 0, 3)
+grid_cell = Vector2i(4, 3)
+
+[node name="Pillar_04_05" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(4, 0, 5)
+grid_cell = Vector2i(4, 5)
+
+[node name="Pillar_04_06" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(4, 0, 6)
+grid_cell = Vector2i(4, 6)
+
+[node name="Pillar_06_02" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(6, 0, 2)
+grid_cell = Vector2i(6, 2)
+
+[node name="Pillar_06_03" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(6, 0, 3)
+grid_cell = Vector2i(6, 3)
+
+[node name="Pillar_06_05" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(6, 0, 5)
+grid_cell = Vector2i(6, 5)
+
+[node name="Pillar_06_06" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(6, 0, 6)
+grid_cell = Vector2i(6, 6)
+
+[node name="Pillar_03_06" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(3, 0, 6)
+grid_cell = Vector2i(3, 6)
+
+[node name="Pillar_07_06" parent="Environment/Props" instance=ExtResource("5_pillar_cell")]
+position = Vector3(7, 0, 6)
+grid_cell = Vector2i(7, 6)
+
+[node name="ExitGate" parent="Environment/Doors" instance=ExtResource("7_exit")]
+
+[node name="Gameplay" type="Node3D" parent="."]
+
+[node name="Player" parent="Gameplay" instance=ExtResource("8_player")]
+position = Vector3(2, 0, 4)
+grid_cell = Vector2i(2, 4)
+
+[node name="Enemy" parent="Gameplay" instance=ExtResource("9_enemy")]
+position = Vector3(8, 0, 4)
+grid_cell = Vector2i(8, 4)
+
+[node name="CameraRig" type="Node3D" parent="."]
+position = Vector3(5, 0, 4)
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig"]
+position = Vector3(0, 10, 11)
+rotation_degrees = Vector3(-40, 0, 0)
+projection = 1
+size = 9.5
+current = true

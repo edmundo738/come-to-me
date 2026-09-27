@@ -1,27 +1,27 @@
-## Update 2026-09-27 — isolated procedural environment slice
+## Update 2026-09-27 — pivot to one editable 3D room
 
 FACT:
-- The owner approved the intermediate mixed 2.5D camera as an environmental development reference. This is not approval of concept illustrations, candidate textures, prop art, or final polish; `concepts/README.md` now records that distinction.
-- `experiments/procedural_first_level/` adds an F6-run alternate scene. It uses the existing player animation and turn-resolution code while generating seeded connected mazes, reachable pickups and exit, blocking walls/pillars, and walkable-only decals. A small experiment-only BFS pursuer prevents maze-corner stalls.
-- The default `scenes/main.tscn`, `scripts/main.gd`, `scripts/grid_world.gd`, character frame PNGs, and animation review/promotion workflow remain unchanged. Generated source images and processed candidate textures are kept in the isolated experiment; no candidate is approved production art.
-- The Gothic/chess experiment deliberately does not place the cable decal, which remains an isolated candidate for a future industrial theme. Some generated cutouts retain colored glow/fringing.
+- The owner’s playtest of the procedural slice found it not fun, scary, or visually coherent; the room read as PNGs in an arena, with mismatched depth, teleport-like movement, and little sense of a grounded world. The report is preserved in `experiments/procedural_first_level/README.md` as owner-observed evidence. The procedural experiment and its assets remain untouched as evidence, not the next production base.
+- `experiments/manual_3d_room/manual_3d_room.tscn` is the next additive prototype: a hand-built 11×9 room with editable Floor/Walls/Props/Decals/Doors, Gameplay actors, and CameraRig. Walls/pillars are separate collision-backed scene instances; their grid occupancy is read from the same nodes that form the visible room.
+- The room directly reuses `EvasionEnemyState` and its existing sight → pursuit → investigation → search → recovery transitions. No new enemy AI system is introduced. Player movement is physical `CharacterBody3D` travel; each grid-boundary crossing advances one enemy unit. A sub-cell movement test is added.
+- The main scene, procedural experiment, animation frames, and rejected walk candidate remain unchanged. The room is not set as the project default and is not approved as final art.
+- The new 3D camera angle, orthographic projection, material palette, tiny movement bob, and static statue silhouette are hypotheses for the test room. Player side-facing idle sequences remain review candidates; the rejected walk asset is not used.
 
-MEASURED:
-- The generated texture candidates are small, grid-sized PNGs; cutout candidates report RGBA channels and transparent corners via ImageMagick. Their residual glow means a transparent corner alone is not a clean-edge/art-quality approval.
-- Existing Python tests: 8 passed. Shell syntax check and `git diff --check` passed.
+OBSERVED:
+- The workspace Git metadata had reset to the initial commit. A byte-for-byte comparison found all 446 remote files present and identical, with no extras or differences; `git reset --mixed` safely aligned the branch to `5dd5fa4` without replacing files.
+- Remote Actions run `36311764605` built the pinned Godot binary, then failed during the headless smoke step. Downloading the log failed with TLS/EOF. The failing test and cause are UNKNOWN; the procedural test must not be reported as passing.
 
 UNKNOWN:
-- Godot parsing, scene/resource import, the new 24-seed connectivity/collision test, actual in-engine behavior, and rendered appearance have not been verified in this workspace. No Godot executable is installed; downloading the existing headless Release asset ended with a TLS/EOF transfer error. The project remains headless-only here, with no human visual playtest. Remote pinned-engine CI run `36311764605` for commit `6a148319503ba3e31f081e160fde7cb6a2e28684` is currently building Godot; the smoke suite is pending.
-- Whether the generated maze and environmental candidates are readable, attractive, fair, and fun remains for display-enabled review.
+- Godot parse/import, scene instantiation, collisions, continuous movement, the re-used Evasion First integration, and all rendered appearance of the new room. No editor executable is available locally; no visual review has happened.
+- Whether the proposed angle and ortho camera preserve immediate cardinal movement reading; whether the billboarded characters look grounded; whether the gentle bob makes movement feel like walking; whether this hand-built situation is strategic, tense, or fun.
 
-CURRENT EXPERIMENT PATHS:
-- Scene: `experiments/procedural_first_level/procedural_first_level.tscn` (F6 in Godot).
-- Technical test: `tests/godot_procedural_first_level.gd`, added to `tests/godot_headless_smoke.sh` for the next available pinned-engine run.
-- Full experiment notes and limitations: `experiments/procedural_first_level/README.md`.
+NEXT:
+- Open `experiments/manual_3d_room/manual_3d_room.tscn` in Godot and run the current scene (F6). Review camera/scale first, then play a first-time movement and sight-loss test. Only adjust what the observation demonstrates; do not add new mechanics or content before this room answers the core question.
 
 ---
 
 # Current Godot environment state
+
 
 FACT:
 - The active project is Come to Me on the fixed branch `arena/01a0dda9-come-to-me`.

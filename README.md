@@ -1,6 +1,6 @@
 # Come to Me
 
-A Godot 4 / GDScript prototype for a 2.5D, screen-aligned grid survival adventure. This first slice deliberately focuses on a small playable foundation rather than future content. The camera is a shallow top-down view: the grid stays square to the screen, so logical up/down/left/right remain visually up/down/left/right.
+A Godot 4 / GDScript prototype for a strategy game with evasion, suspense, survival, and atmospheric exploration. The current project default is the older 2D/grid baseline; the active design test is one additive, hand-built 3D room with 2D characters. Its camera and movement presentation are hypotheses, not approved final art.
 
 ## Open and play
 
@@ -15,9 +15,17 @@ A Godot 4 / GDScript prototype for a 2.5D, screen-aligned grid survival adventur
 
 Blocked moves do not advance the world. A valid move, jump, or wait resolves the pursuer's planned step. Its next cell is not marked: observe how it moves and learn its pursuit pattern. Moving away can lure it into the cell you vacated. An impact consumes a shield; a hit with no charges ends the run.
 
+## Current development focus: one editable room
+
+Open `experiments/manual_3d_room/manual_3d_room.tscn` in the editor and choose **Run Current Scene (F6)**. The project default remains `scenes/main.tscn`, so the old playable baseline is preserved. The room contains real Godot Nodes and reusable Scenes: a collision-backed stone floor, separate wall-cell and pillar instances, a replaceable mesh decal, an Area3D exit gate, a Camera3D, lights, and 2D billboard characters. The occupancy grid is collected from those same wall/pillar scene instances, keeping visible placement and turn-based blocking aligned.
+
+Controls in the room: **WASD / arrows** move continuously in cardinal directions; crossing a cell boundary advances the enemy once. Movement within the same cell does not spend an enemy unit. **E** waits one unit; **R** restarts. The teal gate is the objective. This scene reuses the existing `EvasionEnemyState` state cycle without replacing it. No procedural layout is used in this test.
+
+To explore/edit it, select nodes under `Environment/Floor`, `Environment/Walls`, `Environment/Props`, `Environment/Decals`, `Environment/Doors`, or `CameraRig`. Wall and pillar instances snap to the one-metre floor grid when moved; their collision and logical blocker cell follow the instance. Adjust materials on their MeshInstance3D children. The player and statue are separate scene instances under `Gameplay`.
+
 ## Open it in the Godot editor
 
-If you currently only see the running game, close that game window first. In the **Godot Project Manager**, choose **Import**, select the repository's `project.godot` file, then select the project and click **Edit** (not **Run**). In the editor, `scenes/main.tscn` is in the **FileSystem** panel; double-click it to open the scene. The `scripts` folder contains the GDScript files; double-click a script to edit it.
+If you currently only see the running game, close that game window first. In the **Godot Project Manager**, choose **Import**, select the repository's `project.godot` file, then select the project and click **Edit** (not **Run**). Open `experiments/manual_3d_room/manual_3d_room.tscn` from the **FileSystem** panel to explore the active prototype; open `scenes/main.tscn` for the preserved baseline. The `scripts` and `experiments` folders contain editable GDScript.
 
 To inspect the idle candidates separately, open `scenes/animation_review.tscn` and use **Run Current Scene (F6)**. Use **1–4** to select front/back/left/right, **Space** to pause, **Left/Right** to step while paused, **Up/Down** to adjust speed, and **R** to reset. The left/right loops are test candidates only, not approved production art.
 
@@ -25,35 +33,38 @@ To try the reversible tactical-evasion experiment, open `experiments/evasion_fir
 
 The first SpriteDNA walk attempt was rejected by the user and is archived under `experiments/spritedna/walk_01_rejected/`; its source PNGs remain in the review folder as failure evidence. Do not use it as a gameplay animation. Open that folder's `index.html` in a browser (or serve the folder) to step the original PNGs without GIF accumulation. The original approved idle cycles and the main game are unchanged. A pipeline diagnosis and lossless APNG preview tool are documented in `docs/character-animation/sprite_pipeline_diagnosis.md`.
 
-This first playable prototype draws its board and gameplay characters from code, so the main Scene tree is intentionally sparse. Map walls, coins, player/enemy start cells, and the exit are currently specified in `scripts/grid_world.gd` and `scripts/main.gd`; they are not yet draggable objects in the 2D viewport. The main game now plays the four 12-frame protagonist idle cycles in place, selecting the latest facing direction: front/back use the provisional production-approved art, while left/right load review candidates 05/02 strictly for this test build (they are not promoted to final production art). `scenes/animation_review.tscn` remains a separate Godot `AnimatedSprite2D` scene for reviewing and stepping through the cycles. The game can be edited in the built-in script editor, but level placement still needs a future editor-friendly pass.
+The old 2D baseline still draws its board in `scripts/main.gd`; it remains available for comparison and is not the active environment-building approach. The new room deliberately uses editable 3D nodes/scenes instead of `draw_*()` for world geometry. It reuses the existing front/back idle cycles and the current left/right review sequences only for this test. The tiny gait bob is experimental; the rejected walk candidate is not used. No room look, character integration, or movement quality is approved until viewed and played in Godot.
 
 ## Current structure
 
 ```text
 project.godot
-scenes/main.tscn
-scenes/animation_review.tscn  # four-direction idle review scene
-scripts/
-  animation_review.gd # idle review playback and frame controls
-  main.gd             # run state, turn resolution, drawing and prototype UI
-experiments/spritedna/walk_01_rejected/ # archived, rejected walk attempt
-  grid_world.gd    # logical map, walkability, screen-aligned projection
-  actor_state.gd   # shared logical actor position
-  enemy_state.gd   # deterministic pursuit planning / intent
-  input_router.gd  # device input -> logical actions
+scenes/main.tscn                     # preserved 2D/grid baseline
+scenes/animation_review.tscn
+scripts/                              # shared grid/state/input and old baseline
+experiments/evasion_first_slice/      # accepted enemy-behavior reference
+experiments/manual_3d_room/
+  manual_3d_room.tscn                 # one hand-built editable 3D room (F6)
+  wall_cell.tscn / pillar_cell.tscn   # reusable geometry + collision instances
+  player_character.tscn              # CharacterBody3D + AnimatedSprite3D
+  enemy_statue.tscn                  # 2D statue silhouette in 3D
+  materials/ / art/                   # editable blockout resources
+experiments/procedural_first_level/  # preserved, playtest did not meet the goal
+experiments/spritedna/walk_01_rejected/ # archived; do not use
 ```
 
-The map and game rules use integer grid coordinates; projection and rendering are kept separate. Input is normalized at the boundary so new device bindings can feed the same logical actions. The current room is intentionally hand-authored. Most of its gameplay visuals are vector shapes drawn in GDScript; the protagonist's idle now uses the four directional PNG loops, with left/right review candidates connected only for this test build. The screen-aligned cells, shallow depth treatment, and raised wall faces are a camera/readability prototype, not final art.
+The old baseline retains integer-grid turn rules and the previous screen-aligned renderer. The new manual room derives its logical blockers from selectable scene instances and keeps the cardinal grid beneath continuous 3D movement. Its 2D characters billboard in the real 3D room; this integration is under visual test, not an established style.
 
 ## Project status
 
-- **Game direction:** tactical evasion/horror is the primary experience, supported by survival-horror stakes and atmospheric/narrative exploration; see `docs/game_direction.md` and `docs/gameplay_core_research.md`. The reversible first test scene lives in `experiments/evasion_first_slice/`.
-- **Implemented:** Godot project/scene, screen-aligned shallow top-down grid, four-direction movement and direction-matched 12-frame protagonist idle loops, turn-based enemy response with hidden internal planning, collision and limited shields, directional two-cell jump, wait, fragments, exit, win/game-over states, restart, adaptive viewport centering.
-- **Confirmed running by the project owner:** the project opens in Godot and the game is playable. The owner clarified the camera should not be classic diamond isometric and that enemy movement should be learned by observation, without a visible intent marker. The current pass follows those rules; its camera and wall-depth changes still need a fresh in-editor check.
-- **Measured issue in the default scene:** its greedy Manhattan pursuer can stop at a wall despite a valid route. The reversible experiment uses BFS and adds a line-of-sight / last-seen search cycle; its Godot headless smoke passed, while visual review and human playtesting remain pending (details in `docs/gameplay_core_research.md`).
-- **Godot environment:** see `docs/environment/godot_environment.md` for the pinned headless build, measured smoke-test results, recovery path, and GUI limitations. Headless validation does not confirm visual presentation.
-- **Not yet in the main playable slice:** touchscreen/controller/remote bindings, approved walk/fear animations, sound, procedural maps, multiple levels/characters, narrative progression, and final art/UI. A front-facing walk proof exists only in the separate review scene; it is not integrated into `scenes/main.tscn`. The left/right idle candidates are wired into gameplay only for this test build; they remain unapproved review artwork.
+- **Identity:** strategy with evasion, suspense, survival, and atmospheric exploration. Read the active decisions in `docs/game_direction.md`.
+- **Accepted behavior base:** `EvasionEnemyState` retains vision → pursuit → lost sight → investigation → search → recovery. The manual room reuses it unchanged; see `experiments/evasion_first_slice/`.
+- **Current test:** one manual 3D room, editable 3D floor/walls/pillars/door/decal/camera, 2D Player and statue. The project default is intentionally still the old 2D baseline until the new room is inspected.
+- **Owner playtest:** the procedural slice did not meet the intended fun, suspense, or visual-coherence goals. Keep it as evidence; do not extend it before the hand-built room answers the core design question.
+- **Validation:** all 8 existing Python tests pass. `tests/godot_manual_3d_room.gd` is present but has not been run locally because no Godot executable/editor is available; scene parsing, physics, and visuals remain unverified. Earlier Actions run `36311764605` built Godot but its headless smoke failed, and log transfer failed; the exact failing subtest is UNKNOWN.
+- **Art:** accepted front/back idle frames remain unchanged; left/right cycles are review candidates. The rejected walk sequence is not used. The new statue SVG and puddle are blockout assets, not final approvals.
+- **Environment limitations:** this workspace has no Godot executable or editor GUI. See `docs/environment/current_state.md` for current evidence and the previous headless-run status.
 
 ## Development principle
 
-Plan → implement → test → observe → correct → confirm → expand. The prototype should establish the rules before adding scale or content.
+Context → small decision → implementation → test → observation → checkpoint. Build one situation well before procedural expansion; do not add a mechanic or content batch to cover an unanswered design question.

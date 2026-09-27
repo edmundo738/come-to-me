@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" path="res://experiments/manual_3d_room/art/resin_puddle_blockout.svg" id="1_resin"]
+
+[resource]
+albedo_texture = ExtResource("1_resin")
+transparency = 1
+shading_mode = 0
+cull_mode = 2
